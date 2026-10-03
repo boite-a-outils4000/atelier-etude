@@ -1,0 +1,49 @@
+{
+ "name": "Atelier d'étude",
+ "short_name": "Atelier",
+ "id": "./",
+ "start_url": "./",
+ "scope": "./",
+ "display": "standalone",
+ "display_override": [
+  "window-controls-overlay",
+  "standalone"
+ ],
+ "background_color": "#f4f4f3",
+ "theme_color": "#23807a",
+ "lang": "fr",
+ "dir": "ltr",
+ "description": "Ton cours en PDF à gauche, tes notes à droite. Hors ligne et sans compte.",
+ "icons": [
+  {
+   "src": "icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png"
+  },
+  {
+   "src": "icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png"
+  },
+  {
+   "src": "icon-maskable-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ],
+ "file_handlers": [
+  {
+   "action": "./",
+   "accept": {
+    "application/pdf": [
+     ".pdf"
+    ]
+   }
+  }
+ ],
+ "categories": [
+  "education",
+  "productivity"
+ ]
+}
