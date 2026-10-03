@@ -2,7 +2,7 @@
 
 Ton cours en PDF à gauche, tes notes à droite. Annoter, prendre des notes, réviser (QCM à degrés de certitude, séance du jour, bilan), travailler à plusieurs.
 
-**Utiliser l'application : https://emailconcourspro123-bot.github.io/atelier-etude/**
+**Utiliser l'application : https://boite-a-outils4000.github.io/atelier-etude/**
 
 Tout fonctionne dans le navigateur, hors ligne et sans compte : les notes restent sur l'ordinateur de chaque personne. Ce dépôt ne contient que l'outil.
 
