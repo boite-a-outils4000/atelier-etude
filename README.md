@@ -1,10 +1,12 @@
 # Atelier d'étude
 
-Ton cours en PDF à gauche, tes notes à droite. Annoter, prendre des notes, réviser (QCM à degrés de certitude, séance du jour, bilan), travailler à plusieurs.
+Ton cours en PDF à gauche, tes notes à droite. Annoter, prendre des notes, enregistrer et transcrire le cours, réviser (QCM à degrés de certitude, séance du jour, bilan), travailler à plusieurs.
 
 **Utiliser l'application : https://boite-a-outils4000.github.io/atelier-etude/**
 
 Tout fonctionne dans le navigateur, hors ligne et sans compte : les notes restent sur l'ordinateur de chaque personne. Ce dépôt ne contient que l'outil.
+
+La transcription du cours utilise Whisper (OpenAI, licence MIT) via Transformers.js (Hugging Face, Apache 2.0), exécuté dans le navigateur : le son n'est envoyé nulle part. Le modèle est téléchargé une seule fois depuis Hugging Face.
 
 ## Contenu du dépôt
 
