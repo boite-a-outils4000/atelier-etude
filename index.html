@@ -2009,7 +2009,7 @@ function noteCard(n) {
       ${n.kind === 'qcm' ? '<span class="qcm-st"></span>' : ''}
       ${pnum ? `<button class="pinbadge" title="Montrer l'épingle sur la page">${pnum}</button>` : ''}
       ${showPage ? `<button class="pbadge" title="Aller à la page">p. ${n.page}</button>` : ''}
-      ${(() => { const x = S.doc && (S.doc.recs || []).length ? recAt(S.doc, n.created) : null; return x ? `<button class="recb" title="Réécouter ce que disait le professeur quand tu as écrit cette note">▶ ${fmtT(x.t)}</button>` : ''; })()}
+      ${(() => { const x = S.doc && (S.doc.recs || []).length ? recAt(S.doc, n.created) : null; return !x ? '' : (x.rec.parts || []).length ? `<button class="recb" title="Réécouter ce que disait le professeur quand tu as écrit cette note">▶ ${fmtT(x.t)}</button>` : `<button class="recb txt" title="Voir ce que disait le professeur quand tu as écrit cette note (transcription)">≡ ${fmtT(x.t)}</button>`; })()}
       <div class="dd"><button class="btn ghost more" title="Plus d'options">${ICON.more}</button></div>
       <button class="btn ghost del" title="Supprimer la note">${ICON.trash}</button>
     </div>
@@ -2035,7 +2035,7 @@ function noteCard(n) {
   el.querySelector('.collapse').onclick = () => { n.collapsed = !n.collapsed; el.classList.toggle('collapsed', !!n.collapsed); saveSoon(true); };
   const pb = el.querySelector('.pbadge'); if (pb) pb.onclick = () => goTo(n.page);
   const pinb = el.querySelector('.pinbadge'); if (pinb) pinb.onclick = () => flashPin(n);
-  const recb = el.querySelector('.recb'); if (recb) recb.onclick = () => { const x = recAt(S.doc, n.created); if (x) Player.play(S.doc, x.rec, Math.max(0, x.t - 8)); };
+  const recb = el.querySelector('.recb'); if (recb) recb.onclick = () => { const x = recAt(S.doc, n.created); if (!x) return; if ((x.rec.parts || []).length) Player.play(S.doc, x.rec, Math.max(0, x.t - 8)); else Trans.jump(x.rec, Math.max(0, x.t - 8)); };
   el.querySelector('.del').onclick = () => deleteNote(n);
   el.querySelector('.more').onclick = (e) => { e.stopPropagation(); noteMenu(n, e.currentTarget); };
   el.querySelector('.reveal').onclick = () => { S.shown.add(n.id); el.classList.add('shown'); };
@@ -3361,7 +3361,7 @@ async function mergeBackup(data) {
     (raw.quiz || []).forEach(q => { if (!q || !q.id || !q.q || !Array.isArray(q.choices)) return; const c = { id: String(q.id).slice(0, 60), q: String(q.q).slice(0, 600), choices: q.choices.map(x => String(x).slice(0, 400)).slice(0, 8), answer: Math.max(0, Math.min(q.choices.length - 1, +q.answer || 0)), expl: String(q.expl || '').slice(0, 1200), page: +q.page || 1, theme: String(q.theme || ''), src: 'import', from: String(q.from || ''), added: +q.added || Date.now() }; const i = cur.quiz.findIndex(x => x.id === c.id); if (i < 0) { cur.quiz.push(c); added++; } else cur.quiz[i] = c; });
     Object.entries(raw.rev || {}).forEach(([k, v]) => { if (!v || typeof v !== 'object' || !Array.isArray(v.hist)) return; const ex = cur.rev[k]; if (!ex || (+v.last || 0) > (+ex.last || 0)) { cur.rev[k] = { days: (v.days || []).map(String).slice(-60), due: +v.due || 0, last: +v.last || 0, n: +v.n || 0, ok: +v.ok || 0, danger: !!v.danger, lastOk: !!v.lastOk, hist: v.hist.filter(h => Array.isArray(h)).map(h => [+h[0], h[1] ? 1 : 0, Math.max(0, Math.min(5, +h[2] || 0))]).slice(-40), page: +v.page || 1, q: String(v.q || '').slice(0, 220), type: v.type === 'open' ? 'open' : 'qcm' }; added++; } });
     cur.recs = cur.recs || [];
-    (raw.recs || []).forEach(x => { if (!x || !x.id || !Array.isArray(x.segs)) return; const c = { id: String(x.id).slice(0, 60), title: String(x.title || 'Enregistrement').slice(0, 140), created: +x.created || Date.now(), src: x.src === 'file' ? 'file' : 'mic', model: ASR_MODELS[x.model] ? x.model : 'rapide', lang: ASR_LANGS[x.lang] ? x.lang : 'french', live: !!x.live, parts: (x.parts || []).map(q => ({ i: +q.i || 0, at: +q.at || 0, dur: +q.dur || 0, type: String(q.type || 'audio/webm').slice(0, 60) })), spans: (x.spans || []).map(q => ({ w0: +q.w0 || 0, w1: +q.w1 || 0, at: +q.at || 0 })), pages: (x.pages || []).filter(Array.isArray).map(q => [+q[0] || 0, +q[1] || 1]), segs: x.segs.map(q => ({ a: +q.a || 0, b: +q.b || 0, t: String(q.t || '').slice(0, 4000) })), status: 'done', dur: +x.dur || 0 }; const ex = cur.recs.find(y => y.id === c.id); if (!ex) { cur.recs.push(c); added++; } else if (c.segs.length > (ex.segs || []).length) { ex.segs = c.segs; ex.title = c.title; added++; } });
+    (raw.recs || []).forEach(x => { if (!x || !x.id || !Array.isArray(x.segs)) return; const c = { id: String(x.id).slice(0, 60), title: String(x.title || 'Enregistrement').slice(0, 140), created: +x.created || Date.now(), src: x.src === 'file' ? 'file' : 'mic', model: ASR_MODELS[x.model] ? x.model : 'rapide', lang: ASR_LANGS[x.lang] ? x.lang : 'french', live: !!x.live, parts: (x.parts || []).map(q => ({ i: +q.i || 0, at: +q.at || 0, dur: +q.dur || 0, type: String(q.type || 'audio/webm').slice(0, 60) })), spans: (x.spans || []).map(q => ({ w0: +q.w0 || 0, w1: +q.w1 || 0, at: +q.at || 0 })), pages: (x.pages || []).filter(Array.isArray).map(q => [+q[0] || 0, +q[1] || 1]), segs: x.segs.map(q => ({ a: +q.a || 0, b: +q.b || 0, t: String(q.t || '').slice(0, 4000) })), status: 'done', dur: +x.dur || 0, noAudio: !!x.noAudio }; const ex = cur.recs.find(y => y.id === c.id); if (!ex) { cur.recs.push(c); added++; } else if (c.segs.length > (ex.segs || []).length) { ex.segs = c.segs; ex.title = c.title; added++; } });
     (raw.revLog || []).forEach(l => { if (l && l.t && !cur.revLog.some(x => x.t === l.t)) cur.revLog.push({ t: +l.t, n: +l.n || 0, ok: +l.ok || 0, acc: +l.acc || 0, score: +l.score || 0, cert: +l.cert || 0, scope: l.scope === 'all' ? 'all' : 'doc' }); });
     S.docs.set(cur.fp, cur); await DB.putDoc(cur);
   }
@@ -4764,7 +4764,7 @@ const Rec = {
     }
     const d = S.doc; d.recs = d.recs || [];
     const now = new Date();
-    const r = { id: uid(), title: 'Cours du ' + now.toLocaleDateString('fr-BE', { day: 'numeric', month: 'long' }) + ', ' + now.toLocaleTimeString('fr-BE', { hour: '2-digit', minute: '2-digit' }), created: Date.now(), src: 'mic', model: RecUI.model(), lang: prefs.recLang || 'french', live: prefs.recLive !== false, parts: [], spans: [], pages: [[0, S.current]], segs: [], status: 'rec', dur: 0 };
+    const r = { id: uid(), title: 'Cours du ' + now.toLocaleDateString('fr-BE', { day: 'numeric', month: 'long' }) + ', ' + now.toLocaleTimeString('fr-BE', { hour: '2-digit', minute: '2-digit' }), created: Date.now(), src: 'mic', model: RecUI.model(), lang: prefs.recLang || 'french', live: prefs.recLive !== false, noAudio: prefs.recKeepAudio === false, parts: [], spans: [], pages: [[0, S.current]], segs: [], status: 'rec', dur: 0 };
     d.recs.push(r); this.r = r; this.d = d; this.stream = stream; this.samples = 0; this.on = true; this.paused = false; this.lastPage = S.current;
     try {
       try { this.ctx = new AudioContext({ sampleRate: 16000 }); } catch (e) { this.ctx = new AudioContext(); }
@@ -4779,7 +4779,7 @@ const Rec = {
     } catch (e) { console.warn(e); this.cleanup(); d.recs = d.recs.filter(x => x !== r); return toast('Impossible de démarrer l\'enregistrement : ' + (e.message || e)); }
     this.seg = new AsrSegmenter((s) => TQ.add(d, r, s));
     r.spans.push({ w0: Date.now(), w1: 0, at: 0 });
-    this.newPart();
+    if (!r.noAudio) this.newPart();
     this.timer = setInterval(() => this.tick(), 1000);
     try { if (navigator.wakeLock) this.wake = await navigator.wakeLock.request('screen'); } catch (e) {}
     saveDocObj(d); RecUI.sync(); renderNotes();
@@ -4803,20 +4803,20 @@ const Rec = {
     const r = this.r; if (!r) return;
     r.dur = this.samples / 16000;
     if (S.doc === this.d && S.current !== this.lastPage && !this.paused) { this.lastPage = S.current; r.pages.push([r.dur, S.current]); }
-    if (!this.paused && r.dur - this.part.at >= (this.partSec || 300)) this.rotate();
+    if (this.part && !this.paused && r.dur - this.part.at >= (this.partSec || 300)) this.rotate();
     if (++this.saveTick % 15 === 0) saveDocObj(this.d);
     RecUI.sync(true);
   },
-  pause() { if (!this.on || this.paused) return; this.paused = true; try { this.mr.pause(); } catch (e) {} const sp = this.r.spans[this.r.spans.length - 1]; sp.w1 = Date.now(); RecUI.sync(); saveDocObj(this.d); },
-  resume() { if (!this.on || !this.paused) return; this.paused = false; try { this.mr.resume(); } catch (e) {} this.r.spans.push({ w0: Date.now(), w1: 0, at: this.samples / 16000 }); if (S.doc === this.d) { this.lastPage = S.current; this.r.pages.push([this.samples / 16000, S.current]); } RecUI.sync(); },
+  pause() { if (!this.on || this.paused) return; this.paused = true; try { this.mr && this.mr.pause(); } catch (e) {} const sp = this.r.spans[this.r.spans.length - 1]; sp.w1 = Date.now(); RecUI.sync(); saveDocObj(this.d); },
+  resume() { if (!this.on || !this.paused) return; this.paused = false; try { this.mr && this.mr.resume(); } catch (e) {} this.r.spans.push({ w0: Date.now(), w1: 0, at: this.samples / 16000 }); if (S.doc === this.d) { this.lastPage = S.current; this.r.pages.push([this.samples / 16000, S.current]); } RecUI.sync(); },
   async stop() {
     if (!this.on) return;
     const r = this.r, d = this.d;
     const sp = r.spans[r.spans.length - 1]; if (!sp.w1) sp.w1 = Date.now();
     this.on = false; clearInterval(this.timer);
     try { this.seg.flush(); } catch (e) {}
-    r.dur = this.samples / 16000; this.part.dur = r.dur - this.part.at;
-    const mr = this.mr; await new Promise(res => { try { mr.onstop = () => res(); mr.stop(); setTimeout(res, 1500); } catch (e) { res(); } });
+    r.dur = this.samples / 16000; if (this.part) this.part.dur = r.dur - this.part.at;
+    const mr = this.mr; if (mr) await new Promise(res => { try { mr.onstop = () => res(); mr.stop(); setTimeout(res, 1500); } catch (e) { res(); } });
     this.cleanup();
     r.status = 'done'; saveDocObj(d); RecUI.sync(); renderNotes();
     TQ.kick();
@@ -4827,7 +4827,7 @@ const Rec = {
     try { this.stream && this.stream.getTracks().forEach(t => t.stop()); } catch (e) {}
     try { this.ctx && this.ctx.close(); } catch (e) {}
     try { this.wake && this.wake.release(); } catch (e) {}
-    this.stream = this.ctx = this.node = this.mr = this.wake = null; this.on = false; this.paused = false; this.r = null; this.d = null;
+    this.stream = this.ctx = this.node = this.mr = this.wake = this.part = null; this.on = false; this.paused = false; this.r = null; this.d = null;
   },
 };
 document.addEventListener('visibilitychange', async () => { if (Rec.on && document.visibilityState === 'visible' && navigator.wakeLock) { try { Rec.wake = await navigator.wakeLock.request('screen'); } catch (e) {} } });
@@ -4885,6 +4885,7 @@ const TQ = {
         }
         await AStore.del('jobs', j.key).catch(() => {}); if (this.mem) this.mem.delete(j.key);
         this.list.splice(this.list.indexOf(j), 1);
+        if (!this.left(r) && r.noAudio && r.parts.length) { AStore.delRec(r.id).catch(() => {}); r.parts = []; saveDocObj(d); }
         if (!this.left(r) && r.status !== 'rec' && !(Rec.on && Rec.r === r)) { r.done = Date.now(); saveDocObj(d); if (r.notify) { r.notify = false; toast('Transcription terminée : ' + r.title + '.', { action: 'Voir', onAction: () => Trans.show(r.id) }); } }
         RecUI.sync(); Trans.refresh();
       }
@@ -4995,7 +4996,7 @@ const RecUI = {
     if (r && Rec.on && Rec.r === r && !r.live) return 'La transcription se fera à la fin du cours.';
     return '';
   },
-  qualityLine() { const M = ASR_MODELS[this.model()] || ASR_MODELS.rapide; return `${M.label} · ${prefs.recLive === false ? 'après le cours' : 'en direct'} · ${(ASR_LANGS[prefs.recLang || 'french'] || 'Français').toLowerCase()}`; },
+  qualityLine() { const M = ASR_MODELS[this.model()] || ASR_MODELS.rapide; return `${M.label} · ${prefs.recLive === false ? 'après le cours' : 'en direct'}${prefs.recKeepAudio === false ? ' · texte seulement' : ''} · ${(ASR_LANGS[prefs.recLang || 'french'] || 'Français').toLowerCase()}`; },
   async click(e) {
     e && e.stopPropagation();
     await this.defaults();
@@ -5040,12 +5041,15 @@ const RecUI = {
       <p class="small" style="margin:6px 0 0">${g ? 'Ton ordinateur peut utiliser sa carte graphique : la transcription sera rapide.' : 'Pas de carte graphique utilisable ici : la transcription tourne sur le processeur, plus lentement.'} Le modèle se télécharge une seule fois, puis fonctionne sans connexion.</p></div>
       <div class="field"><span class="lbl">Quand transcrire ?</span><div class="seg" id="rqLive"><button data-v="1" class="${prefs.recLive !== false ? 'on' : ''}">Pendant le cours</button><button data-v="0" class="${prefs.recLive === false ? 'on' : ''}">Après le cours</button></div>
       <p class="small" style="margin:6px 0 0">« Après le cours » laisse toute la puissance à l'enregistrement : utile avec la qualité Précise sur un ordinateur modeste.</p></div>
+      <div class="field"><span class="lbl">Le son</span><div class="seg" id="rqKeep"><button data-v="1" class="${prefs.recKeepAudio !== false ? 'on' : ''}">Garder le son</button><button data-v="0" class="${prefs.recKeepAudio === false ? 'on' : ''}">Seulement le texte</button></div>
+      <p class="small" style="margin:6px 0 0">« Seulement le texte » : le son sert à la transcription puis est effacé dès qu'il est transcrit (à la fin du cours si tu transcris après) ; aucun fichier son n'est gardé. Tu ne pourras pas le réécouter ; le bouton d'une note t'emmène alors au passage correspondant de la transcription.</p></div>
       <div class="field"><span class="lbl">Langue du cours</span><select id="rqLang">${Object.entries(ASR_LANGS).map(([k, v]) => `<option value="${k}" ${(prefs.recLang || 'french') === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
       <p class="small">Avant d'enregistrer, demande l'accord du professeur. L'enregistrement est pour ton usage personnel : ne le diffuse pas.</p>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">${first ? '<button class="btn" data-close2>Plus tard</button><button class="btn primary" id="rqGo">Démarrer l\'enregistrement</button>' : '<button class="btn primary" id="rqOk">Enregistrer les réglages</button>'}</div>`;
     const m = openModal(first ? 'Enregistrer et transcrire le cours' : 'Qualité et réglages', html, 'sm');
     const sg = m.querySelector('#rqLive'); sg.onclick = (e) => { const b = e.target.closest('button'); if (!b) return; sg.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); };
-    const apply = () => { const q = m.querySelector('input[name="rq"]:checked'); if (q) prefs.recModel = q.value; prefs.recLive = sg.querySelector('.on')?.dataset.v !== '0'; prefs.recLang = m.querySelector('#rqLang').value; prefs.recSeen = true; savePrefs(); };
+    const kp = m.querySelector('#rqKeep'); kp.onclick = (e) => { const b = e.target.closest('button'); if (!b) return; kp.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); };
+    const apply = () => { const q = m.querySelector('input[name="rq"]:checked'); if (q) prefs.recModel = q.value; prefs.recLive = sg.querySelector('.on')?.dataset.v !== '0'; prefs.recKeepAudio = kp.querySelector('.on')?.dataset.v !== '0'; prefs.recLang = m.querySelector('#rqLang').value; prefs.recSeen = true; savePrefs(); };
     const c2 = m.querySelector('[data-close2]'); if (c2) c2.onclick = () => { closeModal(); };
     const go = m.querySelector('#rqGo'); if (go) go.onclick = () => { apply(); closeModal(); Rec.start(); };
     const ok = m.querySelector('#rqOk'); if (ok) ok.onclick = () => { apply(); closeModal(); toast('Réglages enregistrés : ' + this.qualityLine() + '.'); };
@@ -5054,7 +5058,7 @@ const RecUI = {
     if (!f) return; if (!S.doc) return toast('Ouvre d\'abord le cours auquel relier cet enregistrement.');
     await this.defaults();
     const d = S.doc; d.recs = d.recs || [];
-    const r = { id: uid(), title: f.name.replace(/\.[a-z0-9]+$/i, ''), created: Date.now(), src: 'file', model: this.model(), lang: prefs.recLang || 'french', live: true, parts: [{ i: 0, at: 0, dur: 0, type: f.type || 'audio/mpeg' }], spans: [], pages: [], segs: [], status: 'done', dur: 0, notify: true };
+    const r = { id: uid(), title: f.name.replace(/\.[a-z0-9]+$/i, ''), created: Date.now(), src: 'file', model: this.model(), lang: prefs.recLang || 'french', live: true, noAudio: prefs.recKeepAudio === false, parts: [{ i: 0, at: 0, dur: 0, type: f.type || 'audio/mpeg' }], spans: [], pages: [], segs: [], status: 'done', dur: 0, notify: true };
     try { await AStore.put('chunks', AStore.key(r.id, 0, 0), f); } catch (e) { return toast('Impossible d\'enregistrer ce fichier : espace disque insuffisant ?'); }
     d.recs.push(r); saveDocObj(d); RecUI.sync();
     await TQ.queueParts(d, r);
@@ -5112,11 +5116,16 @@ const Trans = {
     list.onclick = (e) => {
       const pg = e.target.closest('.tr-page'); if (pg) return goTo(+pg.dataset.p);
       const add = e.target.closest('.tadd'); if (add) { const sg = add.closest('.tseg'); const s = r.segs.find(x => Math.abs(x.a - +sg.dataset.a) < 0.01); if (s) this.toNote(r, s); return; }
-      const tt = e.target.closest('.tt'); if (tt) { const row = tt.closest('[data-a],[data-t]'); const t = +(row.dataset.a ?? row.dataset.t); Player.play(S.doc, r, row.dataset.t ? Math.max(0, t - 5) : t); return; }
+      const tt = e.target.closest('.tt'); if (tt) { const row = tt.closest('[data-a],[data-t]'); const t = +(row.dataset.a ?? row.dataset.t); if (!(r.parts || []).length) { if (row.dataset.t) this.jump(r, t); return; } Player.play(S.doc, r, row.dataset.t ? Math.max(0, t - 5) : t); return; }
       const tn = e.target.closest('.tnote'); if (tn) { const n = S.doc.notes.find(x => x.id === tn.dataset.n); if (n) { S.view = 'page'; goTo(n.page); renderNotes(); setTimeout(() => { const c = document.querySelector(`.note[data-id="${n.id}"]`); if (c) { c.scrollIntoView({ block: 'center' }); c.classList.add('flash'); setTimeout(() => c.classList.remove('flash'), 1200); } }, 60); } }
     };
     if (live && near) box.scrollTop = box.scrollHeight; else box.scrollTop = keep;
     if (Player.r === r) this.mark(Player.time());
+  },
+  // sans son : aller au passage de la transcription correspondant à un moment
+  jump(r, t) {
+    this.sel = r.id; if (S.view !== 'trans') this.show(r.id); else this.render();
+    setTimeout(() => { const rows = [...document.querySelectorAll('.tr-list .tseg')]; let best = null; rows.forEach(x => { if (+x.dataset.a <= t + 0.5) best = x; }); best = best || rows[0]; if (!best) return toast('La transcription de ce moment n\'est pas encore prête.'); rows.forEach(x => x.classList.remove('playing')); best.scrollIntoView({ block: 'center' }); best.classList.add('playing'); setTimeout(() => best.classList.remove('playing'), 2500); }, 80);
   },
   toNote(r, s) {
     let pg = 0; for (const x of (r.pages || [])) if (x[0] <= s.a + 0.01) pg = x[1];
