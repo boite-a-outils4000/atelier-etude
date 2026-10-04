@@ -980,6 +980,38 @@ body.tb-c6 .tb-center .ctl-group + .ctl-group { display: none; } body.tb-c6 .doc
 .pbar .pb-fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--accent); border-radius: 3px; }
 .pbar .pb-rate { min-width: 38px; font-variant-numeric: tabular-nums; }
 
+
+/* ===== v9 : vidéos YouTube ===== */
+.vid-stage { position: absolute; inset: 0; display: flex; flex-direction: column; gap: 10px; padding: 16px 18px 12px; background: var(--viewer-bg); z-index: 2; }
+.vid-frame { flex: 1; min-height: 0; container-type: size; display: flex; align-items: center; justify-content: center; }
+.vid-box { position: relative; width: min(100cqw, calc(100cqh * 16 / 9)); aspect-ratio: 16 / 9; background: #000; border-radius: 10px; overflow: hidden; box-shadow: var(--shadow-lg); }
+.vid-box iframe, .vid-box #ytPlayer { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.vid-msg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 24px 32px; color: #f3f3f3; background: rgba(20,20,20,.92); line-height: 1.5; font-size: 14.5px; }
+.vid-msg a { color: #9fd8d3; }
+.vid-bar { display: flex; align-items: center; gap: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 6px 8px; box-shadow: var(--shadow); }
+.vid-bar .btn { flex: none; }
+.vb-time { font: 600 12.5px var(--ui); font-variant-numeric: tabular-nums; color: var(--muted); min-width: 92px; text-align: center; }
+.vb-track { flex: 1; height: 8px; border-radius: 4px; background: var(--line); position: relative; cursor: pointer; }
+.vb-fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--accent); border-radius: 4px; }
+.vb-marks i { position: absolute; top: 50%; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; background: var(--panel); border: 2px solid #8a5cd6; cursor: pointer; }
+.vb-marks i:hover { transform: scale(1.3); }
+.vb-rate { min-width: 40px; font-variant-numeric: tabular-nums; }
+.vb-tc { white-space: nowrap; }
+.vid-opts { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; color: var(--muted); padding: 0 4px; }
+.vid-opts .vid-keys { margin-left: auto; }
+body.vid #pages, body.vid #thumbs, body.vid #thumbsBtn, body.vid .tb-center .ctl-group, body.vid .tb-center > .dd, body.vid #searchBox,
+body.vid #recBtn, body.vid #recItem, body.vid #readBtn, body.vid #tabPage, body.vid #quoteBtn, body.vid #addPinNote,
+body.vid #ddExport [data-x="sbs"], body.vid #ddExport [data-x="annot"], body.vid #ddExport [data-x="notes"], body.vid #ddBlock [data-ins="capture"], body.vid .note .pbadge { display: none !important; }
+.tc { display: inline-block; font: 600 0.82em var(--ui); font-variant-numeric: tabular-nums; color: #6b45b8; background: rgba(138,92,214,.12); border-radius: 5px; padding: 0 5px; cursor: pointer; white-space: nowrap; }
+.tc::before { content: "▶ "; font-size: .8em; }
+.tc:hover { background: rgba(138,92,214,.22); }
+[data-theme="dark"] .tc { color: #c7b0f5; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tc { color: #c7b0f5; } }
+.recb.vt { background: rgba(138,92,214,.12); color: #6b45b8; }
+[data-theme="dark"] .recb.vt { color: #c7b0f5; }
+.home-vid { margin-top: 10px; }
+
+.vid-only { display: none !important; } body.vid .vid-only { display: inline-flex !important; }
 /* Mouvement réduit */
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
@@ -1051,6 +1083,7 @@ body.tb-c6 .tb-center .ctl-group + .ctl-group { display: none; } body.tb-c6 .doc
   <h5>Mes cours</h5>
   <button id="libBtn"><span class="ico"><svg class="i" viewBox="0 0 24 24"><path d="M4 19V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zm0 0a2 2 0 0 0 2 2h13"/></svg></span><span class="tx">Bibliothèque<span class="d">Tous les cours annotés</span></span></button>
   <button data-c="open"><span class="ico"><svg class="i" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span><span class="tx">Ouvrir un PDF…</span><span class="k kbd">⌘O</span></button>
+  <button id="vidItem"><span class="ico"><svg class="i" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="3.5"/><path d="M10 9.2v5.6l4.8-2.8z"/></svg></span><span class="tx">Ouvrir une vidéo YouTube…<span class="d">Notes avec le minutage, pause automatique</span></span></button>
   <button data-c="close" class="needdoc-item"><span class="ico"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></span><span class="tx">Fermer ce cours<span class="d">Retour à l'accueil ; tes notes restent enregistrées</span></span></button>
   <hr><h5>Pendant le cours</h5>
   <button id="refBtn" class="needdoc-item"><span class="ico"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="8" height="16" rx="1.5"/><rect x="13" y="4" width="8" height="16" rx="1.5"/></svg></span><span class="tx">Document de référence à côté<span class="d">Un article, un décret… consulté en même temps</span></span></button>
@@ -1119,6 +1152,7 @@ body.tb-c6 .tb-center .ctl-group + .ctl-group { display: none; } body.tb-c6 .doc
           <div class="drop" id="drop">
             <button class="btn primary lg" id="openBtn2"><svg class="i" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Ouvrir un nouveau PDF</button>
             <p>ou glisse un fichier ici · <span class="kbd">⌘O</span></p>
+            <button class="btn home-vid" id="vidBtn2"><svg class="i" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="3.5"/><path d="M10 9.2v5.6l4.8-2.8z"/></svg>Prendre des notes sur une vidéo YouTube</button>
             <p class="small">Un PowerPoint s'exporte en PDF via Fichier → Exporter → PDF.</p>
           </div>
         </div>
@@ -1196,6 +1230,7 @@ body.tb-c6 .tb-center .ctl-group + .ctl-group { display: none; } body.tb-c6 .doc
       <span class="sep"></span>
       <div class="dd"><button class="btn" data-dd="ddBlock" title="Insérer un encadré, un tableau, une capture… (ou tape /)"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span class="lbl-ins">Insérer</span> <span class="caret">▾</span></button></div>
       <button class="btn" id="quoteBtn" title="Copier dans la note le passage sélectionné dans le PDF">❝</button>
+      <button class="btn vid-only" id="tcBtn" title="Insérer le minutage de la vidéo (⌥T)">⏱</button>
       <div class="dd"><button class="btn" data-dd="ddMore" title="Plus : souligné, barré, retrait, effacer la mise en forme">⋯</button></div>
     </div>
     <div class="dd-menu keep" id="ddFilter"><h5>Afficher seulement</h5><div class="filters" id="filters"></div><div class="small" style="padding:0 10px 6px">Clique à nouveau pour retirer un filtre.</div><div id="peersRow" style="padding:4px 10px 8px;border-top:1px solid var(--line)"><label class="switch hidden" id="peersSwitch" title="Afficher les notes de tes collègues"><input type="checkbox" id="showPeers"> Notes des collègues</label></div></div>
@@ -1419,7 +1454,7 @@ const S = {
 };
 function normalizeDoc(d) {
   d.notes = (d.notes || []).map(n => Object.assign({ id: uid(), page: 1, title: '', html: '', tags: [], created: Date.now(), updated: Date.now() }, n));
-  d.highlights = d.highlights || []; d.visited = d.visited || []; d.anchors = d.anchors || []; d.peers = d.peers || {}; d.ink = d.ink || []; d.quiz = d.quiz || []; d.rev = d.rev || {}; d.revLog = d.revLog || []; d.recs = d.recs || []; return d;
+  d.highlights = d.highlights || []; d.visited = d.visited || []; d.anchors = d.anchors || []; d.peers = d.peers || {}; d.ink = d.ink || []; d.quiz = d.quiz || []; d.rev = d.rev || {}; d.revLog = d.revLog || []; d.recs = d.recs || []; if (/^yt:/.test(d.fp || '')) { d.kind = 'video'; d.vid = d.fp.slice(3); } return d;
 }
 
 
@@ -1539,7 +1574,9 @@ async function openFile(file, handle) {
   finally { $('loading').classList.remove('on'); }
 }
 async function activateTab(tab, first) {
+  if (tab.video) return Vid.activate(tab, first);
   if (S.fp === tab.fp && S.pages.length) { renderTabs(); return; }
+  if (Vid.doc) Vid.hide();
   if (S.doc) { S.doc.lastPage = S.current; await flushSave(); }
   stopMode(); hideBubble(); document.body.classList.remove('nodoc');
   S.pdf = tab.pdf; S.bytes = tab.bytes; S.fp = tab.fp;
@@ -1573,7 +1610,7 @@ async function closeTab(tab) {
   setTimeout(() => { try { tab.pdf.destroy(); } catch (e) {} }, 500);
 }
 function showWelcome() {
-  stopMode(); S.pdf = null; S.doc = null; S.fp = null; S.bytes = null; S.pages = []; $('pages').innerHTML = ''; $('thumbs').innerHTML = '';
+  Vid.hide(); stopMode(); S.pdf = null; S.doc = null; S.fp = null; S.bytes = null; S.pages = []; $('pages').innerHTML = ''; $('thumbs').innerHTML = '';
   $('welcome').classList.remove('hidden'); $('notesPane').classList.add('off');
   $('docTitle').value = ''; $('docTitle').disabled = true; $('pageTotal').textContent = '/ –'; $('pageInput').value = '–';
   renderNotes(); renderRecents(); renderTabs();
@@ -1871,7 +1908,7 @@ window.addEventListener('beforeunload', (e) => {
 
 /* =================== Nettoyage du HTML des notes =================== */
 const OK_TAGS = new Set(['B','STRONG','I','EM','U','S','STRIKE','H2','H3','H4','UL','OL','LI','P','DIV','BR','SPAN','BLOCKQUOTE','HR','TABLE','TBODY','TR','TD','FIGURE','FIGCAPTION','IMG']);
-const OK_CLASS = new Set(['check','done','callout','def','ret','ex','att','tbl','cap','big','lnk','lnk-cap','cornell','c-q','c-n','c-s','fld']);
+const OK_CLASS = new Set(['tc', 'check','done','callout','def','ret','ex','att','tbl','cap','big','lnk','lnk-cap','cornell','c-q','c-n','c-s','fld']);
 function sanitize(html) {
   const tpl = document.createElement('template'); tpl.innerHTML = html || '';
   const walk = (node) => {
@@ -1888,10 +1925,11 @@ function sanitize(html) {
         const color = ch.style ? ch.style.color : '', bg = ch.style ? ch.style.backgroundColor : '';
         const fw = ch.style ? ch.style.fontWeight : '', fst = ch.style ? ch.style.fontStyle : '', tdc = ch.style ? (ch.style.textDecorationLine || ch.style.textDecoration || '') : '';
         const src = tag === 'IMG' ? ch.getAttribute('src') : null;
-        const da = ch.getAttribute('data-a');
+        const da = ch.getAttribute('data-a'); const dt = ch.getAttribute('data-t');
         [...ch.attributes].forEach(a => ch.removeAttribute(a.name));
         if (da && /^[a-z0-9]{4,40}$/i.test(da) && (tag === 'SPAN' || tag === 'FIGURE')) ch.setAttribute('data-a', da);
         if (cls.length) ch.className = cls.join(' ');
+        if (tag === 'SPAN' && cls.includes('tc') && dt && /^\d{1,6}$/.test(dt)) { ch.setAttribute('data-t', dt); ch.setAttribute('contenteditable', 'false'); }
         if (color) ch.style.color = color; if (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)') ch.style.backgroundColor = bg;
         if (tag === 'IMG') { if (src && /^data:image\/(png|jpe?g|webp|gif);base64,/.test(src)) ch.setAttribute('src', src); else { ch.remove(); return; } }
         walk(ch);
@@ -1914,6 +1952,7 @@ function visibleNotes() {
   else if (S.view === 'page') list = list.filter(n => n.page === S.current);
   if (S.filters.size) list = list.filter(n => n.tags.some(t => S.filters.has(t)));
   if (S.view === 'all' && prefs.sort === 'date' && !S.nq) list.sort((a, b) => b.updated - a.updated);
+  else if (S.doc.kind === 'video') list.sort((a, b) => (a.t ?? 1e9) - (b.t ?? 1e9) || a.created - b.created);
   else list.sort((a, b) => a.page - b.page || ordKey(a) - ordKey(b));
   return list;
 }
@@ -1948,7 +1987,7 @@ function renderNotes() {
   const notes = visibleNotes();
   const pnotes = visiblePeerNotes();
   updatePeerUI();
-  const grouped = (S.view === 'all' && !(prefs.sort === 'date')) || S.nq;
+  const grouped = S.doc.kind !== 'video' && ((S.view === 'all' && !(prefs.sort === 'date')) || S.nq);
   const hlPages = (S.view === 'all' && prefs.hlInList && !S.nq && !S.filters.size) ? new Set(S.doc.highlights.map(h => h.page)) : new Set();
   if (S.view === 'page' && !S.nq && prefs.hlInList && !S.filters.size) S.doc.highlights.filter(h => h.page === S.current).forEach(h => list.appendChild(hlQuote(h)));
   if (!notes.length && pnotes.length && !grouped) {
@@ -1959,6 +1998,7 @@ function renderNotes() {
     const e = document.createElement('div'); e.className = 'empty';
     if (S.nq) e.innerHTML = `<b>Aucune note ne contient « ${esc($('noteSearch').value)} »</b>Essaie un autre mot, ou cherche dans tous tes cours via la Bibliothèque.`;
     else if (S.filters.size) e.innerHTML = '<b>Aucune note avec ce filtre</b>Clique à nouveau sur une étiquette pour la désactiver.';
+    else if (S.doc.kind === 'video') e.innerHTML = `<b>Pas encore de note sur cette vidéo</b>Écris en bas ou dans une note : la vidéo se met en pause et la note garde le moment où tu l'as prise.<div class="tips">• <span class="kbd">⌥T</span> ou « ⏱ Note ici » : une note avec le minutage<br>• <span class="kbd">⌥K</span> lecture / pause, <span class="kbd">⌥J</span> reculer de 5 s<br>• un clic sur un minutage dans une note fait revenir la vidéo à ce moment</div>`;
     else if (S.view === 'page') e.innerHTML = `<b>Pas encore de note sur la page ${S.current}</b>Tape une note rapide en bas (Entrée pour l'ajouter), ou :<div class="tips">• sélectionne un passage du PDF pour le <b>surligner</b> ou le <b>citer</b><br>• <span class="kbd">⌥E</span> pour une note <b>épinglée</b> à un endroit précis<br>• <span class="kbd">⌥A</span> pour <b>associer</b> un titre, un mot ou une image à tes notes<br>• <span class="kbd">⌥C</span> pour <b>capturer</b> un schéma dans une note<br>• <span class="kbd">⌥D</span> pour <b>dessiner</b> ou écrire sur la page<br>• dans une note, tape <span class="kbd">/</span> pour insérer un encadré</div>`;
     else e.innerHTML = '<b>Aucune note pour ce cours</b>Tes notes apparaîtront ici, classées par page.';
     list.appendChild(e); return;
@@ -2009,7 +2049,7 @@ function noteCard(n) {
       ${n.kind === 'qcm' ? '<span class="qcm-st"></span>' : ''}
       ${pnum ? `<button class="pinbadge" title="Montrer l'épingle sur la page">${pnum}</button>` : ''}
       ${showPage ? `<button class="pbadge" title="Aller à la page">p. ${n.page}</button>` : ''}
-      ${(() => { const x = S.doc && (S.doc.recs || []).length ? recAt(S.doc, n.created) : null; return !x ? '' : (x.rec.parts || []).length ? `<button class="recb" title="Réécouter ce que disait le professeur quand tu as écrit cette note">▶ ${fmtT(x.t)}</button>` : `<button class="recb txt" title="Voir ce que disait le professeur quand tu as écrit cette note (transcription)">≡ ${fmtT(x.t)}</button>`; })()}
+      ${(() => { if (S.doc && S.doc.kind === 'video') return n.t != null ? `<button class="recb vt" title="Revoir ce moment de la vidéo">▶ ${fmtT(n.t)}</button>` : ''; const x = S.doc && (S.doc.recs || []).length ? recAt(S.doc, n.created) : null; return !x ? '' : (x.rec.parts || []).length ? `<button class="recb" title="Réécouter ce que disait le professeur quand tu as écrit cette note">▶ ${fmtT(x.t)}</button>` : `<button class="recb txt" title="Voir ce que disait le professeur quand tu as écrit cette note (transcription)">≡ ${fmtT(x.t)}</button>`; })()}
       <div class="dd"><button class="btn ghost more" title="Plus d'options">${ICON.more}</button></div>
       <button class="btn ghost del" title="Supprimer la note">${ICON.trash}</button>
     </div>
@@ -2021,7 +2061,7 @@ function noteCard(n) {
   title.addEventListener('keydown', (e) => { if (e.key === 'Enter' || (e.key === 'ArrowDown')) { e.preventDefault(); placeCaretEnd(body); } if (e.key === 'Escape') { title.blur(); viewer.focus({ preventScroll: true }); } });
   const body = el.querySelector('.body'); body.innerHTML = sanitize(n.html);
   if (n.kind === 'qcm') { el.dataset.kind = 'qcm'; qcmBadge(el, n); }
-  body.querySelectorAll('.lnk,.lnk-cap').forEach(x => x.setAttribute('contenteditable', 'false'));
+  body.querySelectorAll('.lnk,.lnk-cap,.tc').forEach(x => x.setAttribute('contenteditable', 'false'));
   wireEditor(body, n);
   const tags = el.querySelector('.note-tags');
   TAGS.forEach(t => {
@@ -2035,7 +2075,7 @@ function noteCard(n) {
   el.querySelector('.collapse').onclick = () => { n.collapsed = !n.collapsed; el.classList.toggle('collapsed', !!n.collapsed); saveSoon(true); };
   const pb = el.querySelector('.pbadge'); if (pb) pb.onclick = () => goTo(n.page);
   const pinb = el.querySelector('.pinbadge'); if (pinb) pinb.onclick = () => flashPin(n);
-  const recb = el.querySelector('.recb'); if (recb) recb.onclick = () => { const x = recAt(S.doc, n.created); if (!x) return; if ((x.rec.parts || []).length) Player.play(S.doc, x.rec, Math.max(0, x.t - 8)); else Trans.jump(x.rec, Math.max(0, x.t - 8)); };
+  const recb = el.querySelector('.recb'); if (recb) recb.onclick = () => { if (S.doc.kind === 'video') { Vid.seek(Math.max(0, n.t - 3), true); return; } const x = recAt(S.doc, n.created); if (!x) return; if ((x.rec.parts || []).length) Player.play(S.doc, x.rec, Math.max(0, x.t - 8)); else Trans.jump(x.rec, Math.max(0, x.t - 8)); };
   el.querySelector('.del').onclick = () => deleteNote(n);
   el.querySelector('.more').onclick = (e) => { e.stopPropagation(); noteMenu(n, e.currentTarget); };
   el.querySelector('.reveal').onclick = () => { S.shown.add(n.id); el.classList.add('shown'); };
@@ -2074,9 +2114,10 @@ function deleteNote(n) {
 function addNote(opt = {}) {
   if (!S.doc) return;
   if (S.nq) clearNoteSearch();
-  S.filters.clear(); S.view = 'page';
+  S.filters.clear(); S.view = S.doc.kind === 'video' ? 'all' : 'page';
   const page = opt.page || S.current;
   const n = { id: uid(), page, title: opt.title || '', html: opt.html || '', tags: [], created: Date.now(), updated: Date.now() };
+  if (S.doc.kind === 'video' && Vid.active()) n.t = Math.floor(Vid.time());
   if (opt.pin) n.pin = opt.pin;
   S.doc.notes.push(n); S.shown.add(n.id);
   saveSoon(); if (page !== S.current) goTo(page, false);
@@ -2152,7 +2193,7 @@ quick.addEventListener('keydown', (e) => {
     if (lines.length === 1 && t.length <= 90) title = t;
     else { if (lines[0].length <= 90) { title = lines.shift(); } html = lines.map(l => `<div>${esc(l)}</div>`).join(''); }
     addNote({ title, html, noFocus: true }); quick.value = ''; autosize();
-    toast(`Note ajoutée à la page ${S.current}.`, { duration: 1600 });
+    toast(S.doc.kind === 'video' ? `Note ajoutée à ${fmtT(Vid.time())}.` : `Note ajoutée à la page ${S.current}.`, { duration: 1600 });
   }
   if (e.key === 'Escape') { quick.blur(); viewer.focus({ preventScroll: true }); }
 });
@@ -2862,7 +2903,7 @@ function insertIntoBody(body, html) {
   const r = document.createRange(); r.selectNodeContents(body); r.collapse(false);
   s.addRange(r);
   exec('insertHTML', html);
-  body.querySelectorAll('.lnk,.lnk-cap').forEach(x => x.setAttribute('contenteditable', 'false'));
+  body.querySelectorAll('.lnk,.lnk-cap,.tc').forEach(x => x.setAttribute('contenteditable', 'false'));
   S.savedRange = s.rangeCount ? s.getRangeAt(0).cloneRange() : null;
   commit(body);
 }
@@ -3134,6 +3175,7 @@ async function openCourse(fp, page, noteId) {
   const d = S.docs.get(fp); if (!d) return;
   const after = () => { if (page) goTo(page, false); if (noteId) setTimeout(() => focusNote(noteId), 150); };
   if (fp === S.fp) { after(); return; }
+  if (d.kind === 'video') { await Vid.open(d.vid); after(); return; }
   const ot = S.tabs.find(t => t.fp === fp); if (ot) { await activateTab(ot); after(); return; }
   const h = await DB.get('pdf:' + fp);
   if (h && h.getFile) {
@@ -3317,6 +3359,7 @@ function htmlToMd(html, plain) {
   return block(d).replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
 }
 function exportMd(d) {
+  if (d.kind === 'video') return Vid.exportMd(d);
   if (!d.notes.length && !d.highlights.length) return toast('Aucune note à exporter pour ce cours.');
   let md = `# ${d.title}\n\n*Notes personnelles · ${today()} · fichier : ${d.name} · ${d.notes.length} notes. Les numéros de page renvoient aux pages du PDF.*\n`;
   const pages = [...new Set([...d.notes.map(n => n.page), ...d.highlights.map(h => h.page)])].sort((a, b) => a - b);
@@ -3349,6 +3392,7 @@ async function mergeBackup(data) {
       if (n.srs && isFinite(n.srs.box)) clean.srs = { box: Math.max(1, Math.min(5, +n.srs.box)), due: +n.srs.due || 0, last: +n.srs.last || 0 };
       if (n.collapsed) clean.collapsed = true;
       if (n.kind === 'qcm') clean.kind = 'qcm';
+      if (typeof n.t === 'number' && isFinite(n.t)) clean.t = Math.max(0, Math.floor(n.t));
       const ex = cur.notes.find(x => x.id === clean.id);
       if (!ex) { cur.notes.push(clean); added++; } else if (clean.updated > ex.updated) { Object.assign(ex, clean); added++; }
     });
@@ -3427,7 +3471,7 @@ function focusPeerNote(pid, nid) {
   setTimeout(() => { renderNotes(); const c = document.querySelector(`.note.peer[data-id="${nid}"]`); if (c) { c.scrollIntoView({ block: 'center', behavior: 'smooth' }); c.classList.add('flash'); setTimeout(() => c.classList.remove('flash'), 1300); } }, 60);
 }
 function cleanPeer(pe, color) {
-  const cn = (n) => ({ id: String(n.id || uid()), page: +n.page || 1, title: String(n.title || '').slice(0, 300), html: sanitize(n.html || ''), tags: (n.tags || []).filter(t => TAGS.some(x => x.id === t)), created: +n.created || 0, updated: +n.updated || 0, ...(n.pin && isFinite(n.pin.x) ? { pin: { x: +n.pin.x, y: +n.pin.y } } : {}) });
+  const cn = (n) => ({ id: String(n.id || uid()), page: +n.page || 1, title: String(n.title || '').slice(0, 300), html: sanitize(n.html || ''), tags: (n.tags || []).filter(t => TAGS.some(x => x.id === t)), created: +n.created || 0, updated: +n.updated || 0, ...(typeof n.t === 'number' && isFinite(n.t) ? { t: Math.floor(n.t) } : {}), ...(n.pin && isFinite(n.pin.x) ? { pin: { x: +n.pin.x, y: +n.pin.y } } : {}) });
   const cr = (r) => ({ x: +r.x, y: +r.y, w: +r.w, h: +r.h });
   return {
     id: String(pe.id), name: String(pe.name || 'Collègue').slice(0, 40), color: color || PEER_COLORS[0], matched: pe.matched !== false,
@@ -3484,7 +3528,7 @@ function openShare() {
       let html = n.html || '';
       if (!withImg) html = html.replace(/<figure[\s\S]*?<\/figure>/gi, '<div><i>[capture non partagée]</i></div>');
       if (!withPos) html = html.replace(/\sdata-a="[a-z0-9]+"/gi, '');
-      const o = { id: n.id, page: n.page, title: n.title, html, tags: n.tags, created: n.created, updated: n.updated };
+      const o = { id: n.id, page: n.page, title: n.title, html, tags: n.tags, created: n.created, updated: n.updated }; if (n.t != null) o.t = n.t;
       if (withPos && n.pin) o.pin = n.pin; return o;
     });
     const refs = new Set(); notes.forEach(n => { const re = /data-a="([a-z0-9]+)"/gi; let mm; while ((mm = re.exec(n.html))) refs.add(mm[1]); });
@@ -3806,7 +3850,7 @@ function openHelp() {
     <div>Fiches de révision <span>${k('⌥F')}</span></div>
     <div>Mode lecture plein écran <span>${k('⌥L')}</span></div><div>Modèle de note <span>▾ à côté de +, ou ${k('/')}</span></div>
     <div>Déplacer une note <span>glisser ⋮⋮</span></div><div>Historique des sauvegardes <span>bouton Sauvegarde</span></div>
-    <div>Enregistrer le cours · arrêter <span>${k('⌥M')}</span></div><div>Dessiner sur la page <span>${k('⌥D')}</span></div><div>Annuler le dernier trait <span>${k('⌘Z')}</span></div>
+    <div>Enregistrer le cours · arrêter <span>${k('⌥M')}</span></div><div>Vidéo : lecture / pause · −5 s <span>${k('⌥K')} ${k('⌥J')}</span></div><div>Vidéo : insérer le minutage <span>${k('⌥T')}</span></div><div>Dessiner sur la page <span>${k('⌥D')}</span></div><div>Annuler le dernier trait <span>${k('⌘Z')}</span></div>
     <div>Changer d'onglet <span>${k('⌥1')} … ${k('⌥9')}</span></div><div>Note rapide <span>tape en bas + ${k('Entrée')}</span></div>
     <div>Quitter la note (retour au PDF) <span>${k('Échap')}</span></div><div>Note suivante / note rapide <span>${k('⌘Entrée')}</span></div>
     <div>Mode « Associer » <span>${k('⌥A')}</span></div><div>Associer en un clic, sans mode <span>${k('⌥')} + clic</span></div>
@@ -4347,6 +4391,7 @@ const dataUrlBytes = (u) => { const b = atob(u.split(',')[1] || ''); const a = n
 
 const ToClaude = {
   async build(d, opt) {
+    if (d.kind === 'video') return Vid.claudeMd(d, opt);
     const since = opt.since || 0; const imgs = []; const list = await Outline.compute().catch(() => []);
     const secTitle = (n) => { const i = Outline.sectionOf(list, n); return i != null ? list[i].title : ''; };
     const secOfPage = (p) => { let k = null; list.forEach((e, i) => { if (e.page <= p) k = i; }); return k != null ? list[k].title : ''; };
@@ -4410,7 +4455,7 @@ const ToClaude = {
       <p class="small" style="margin-top:10px">Ensuite, dans une conversation avec moi : joins ce fichier et la synthèse PDF à compléter, et écris par exemple « Intègre mes notes dans la synthèse ».</p>`;
     const m = openModal('Envoyer à Claude', html, 'sm');
     const opt = () => ({ hl: m.querySelector('#tcHl').checked, images: m.querySelector('#tcImg').checked, peers: !!(m.querySelector('#tcPeers') || {}).checked, trans: !!(m.querySelector('#tcTr') || {}).checked, since: last && m.querySelector('#tcScope .on')?.dataset.v === 'new' ? last : 0 });
-    const upd = async () => { const r = await this.build(d, opt()); const c = r.count; m.querySelector('#tcSum').textContent = c.pages || c.trans ? `${c.notes} note${c.notes > 1 ? 's' : ''}, ${c.hls} surlignage${c.hls > 1 ? 's' : ''}${c.peers ? ', ' + c.peers + ' note(s) de collègues' : ''}, ${c.imgs} capture${c.imgs > 1 ? 's' : ''}, sur ${c.pages} page${c.pages > 1 ? 's' : ''}${c.trans ? ' ; ' + c.trans + ' transcription' + (c.trans > 1 ? 's' : '') + ' du cours oral' : ''}.` : 'Rien de nouveau à envoyer.'; m.querySelector('#tcGo').disabled = m.querySelector('#tcCopy').disabled = !(c.pages || c.trans); };
+    const upd = async () => { const r = await this.build(d, opt()); const c = r.count; m.querySelector('#tcSum').textContent = d.kind === 'video' ? (c.notes ? `${c.notes} note${c.notes > 1 ? 's' : ''} sur la vidéo, avec leur minutage.` : 'Rien de nouveau à envoyer.') : c.pages || c.trans ? `${c.notes} note${c.notes > 1 ? 's' : ''}, ${c.hls} surlignage${c.hls > 1 ? 's' : ''}${c.peers ? ', ' + c.peers + ' note(s) de collègues' : ''}, ${c.imgs} capture${c.imgs > 1 ? 's' : ''}, sur ${c.pages} page${c.pages > 1 ? 's' : ''}${c.trans ? ' ; ' + c.trans + ' transcription' + (c.trans > 1 ? 's' : '') + ' du cours oral' : ''}.` : 'Rien de nouveau à envoyer.'; m.querySelector('#tcGo').disabled = m.querySelector('#tcCopy').disabled = !(c.pages || c.trans); };
     m.addEventListener('change', upd); const sc = m.querySelector('#tcScope'); if (sc) sc.addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; sc.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); upd(); });
     upd();
     const done = () => { d.lastClaude = Date.now(); saveSoon(true); Backup.touch(); };
@@ -5186,6 +5231,224 @@ const Trans = {
 };
 window.Rec = Rec; window.Trans = Trans; window.TQ = TQ; window.Player = Player; window.RecUI = RecUI; window.AStore = AStore; window.Asr = Asr; window.AsrSegmenter = AsrSegmenter;
 
+
+/* =================== Vidéos YouTube : prendre des notes avec le minutage =================== */
+const Vid = {
+  p: null, ready: false, tab: null, doc: null, timer: null, autoPaused: false, rate: 1, lastSave: 0, marksN: -1, _api: null, err: '',
+  active() { return !!(S.doc && S.doc.kind === 'video' && this.doc === S.doc); },
+  parse(u) {
+    u = String(u || '').trim(); if (!u) return null;
+    let m = u.match(/(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:watch\?(?:[^#]*&)?v=|embed\/|shorts\/|live\/|v\/))([A-Za-z0-9_-]{11})/);
+    if (!m && /^[A-Za-z0-9_-]{11}$/.test(u)) m = [u, u];
+    if (!m) return null;
+    let t = 0; const tm = u.match(/[?&#](?:t|start)=([0-9hms]+)/);
+    if (tm) { const x = tm[1]; if (/^\d+$/.test(x)) t = +x; else { const h = /(\d+)h/.exec(x), mi = /(\d+)m/.exec(x), s = /(\d+)s/.exec(x); t = (h ? +h[1] * 3600 : 0) + (mi ? +mi[1] * 60 : 0) + (s ? +s[1] : 0); } }
+    return { id: m[1], t };
+  },
+  link(d, t) { return 'https://youtu.be/' + d.vid + (t ? '?t=' + Math.floor(t) : ''); },
+  ask() {
+    const m = openModal('Ouvrir une vidéo YouTube', `<p>Colle l'adresse de la vidéo (depuis la barre d'adresse de YouTube ou le bouton « Partager »).</p>
+      <input id="vidUrl" class="inp" style="width:100%" placeholder="https://www.youtube.com/watch?v=…" autocomplete="off">
+      <p class="small" id="vidErr" style="color:var(--danger);min-height:1.2em;margin:6px 0 0"></p>
+      <p class="small">Tu prends tes notes à droite : chaque note garde le moment de la vidéo, et la vidéo se met en pause quand tu écris.${/^https?:$/.test(location.protocol) ? '' : ' <b>Attention :</b> YouTube ne fonctionne que dans la version en ligne de l\'Atelier.'}</p>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px"><button class="btn" data-close2>Annuler</button><button class="btn primary" id="vidGo">Ouvrir la vidéo</button></div>`, 'sm');
+    const i = m.querySelector('#vidUrl'); setTimeout(() => i.focus(), 30);
+    const go = () => { const r = this.parse(i.value); if (!r) { m.querySelector('#vidErr').textContent = 'Ce n\'est pas une adresse de vidéo YouTube.'; return; } closeModal(); this.open(r.id, r.t); };
+    m.querySelector('#vidGo').onclick = go; i.onkeydown = (e) => { if (e.key === 'Enter') go(); };
+    m.querySelector('[data-close2]').onclick = closeModal;
+  },
+  async open(id, t) {
+    const fp = 'yt:' + id;
+    let d = S.docs.get(fp);
+    if (!d) { d = normalizeDoc({ fp, name: 'YouTube · ' + id, title: 'Vidéo YouTube', notes: [], created: Date.now() }); S.docs.set(fp, d); }
+    if (t) d.lastT = t;
+    let tab = S.tabs.find(x => x.fp === fp);
+    if (!tab) { tab = { fp, video: true, name: d.title }; S.tabs.push(tab); }
+    else if (t && this.active() && this.doc === d) { this.seek(t, true); return; }
+    await activateTab(tab, true);
+  },
+  async activate(tab, first) {
+    if (S.fp === tab.fp && this.doc === S.doc && this.p) { renderTabs(); return; }
+    if (S.doc) { S.doc.lastPage = S.current; if (this.active()) S.doc.lastT = this.time(); await flushSave(); }
+    stopMode(); hideBubble(); document.body.classList.remove('nodoc'); document.body.classList.add('vid');
+    S.pdf = null; S.bytes = null; S.fp = tab.fp; S.pages = []; $('pages').innerHTML = ''; $('thumbs').innerHTML = '';
+    const d = S.docs.get(tab.fp); d.lastOpened = Date.now(); S.doc = d; this.doc = d; S.current = 1;
+    S.search = { q: '', hits: [], idx: -1, texts: {} }; S.shown.clear(); S.filters.clear(); S.nq = ''; $('noteSearch').value = ''; $('noteSearchClr').classList.add('hidden');
+    $('docTitle').value = d.title; $('docTitle').disabled = false;
+    $('welcome').classList.add('hidden'); $('notesPane').classList.remove('off');
+    S.view = 'all';
+    this.mount(d);
+    saveSoon(true); renderNotes(); renderTabs(); setTimeout(fitTopbar, 30);
+    const n = d.notes.length;
+    if (first && n) toast(`${n} note${n > 1 ? 's' : ''} retrouvée${n > 1 ? 's' : ''} · reprise à ${fmtT(d.lastT || 0)}.`);
+  },
+  hide() {
+    document.body.classList.remove('vid');
+    if (this.p) { try { this.p.pauseVideo(); } catch (e) {} }
+    if (this.doc && this.ready) { try { this.doc.lastT = this.p.getCurrentTime(); DB.putDoc(this.doc).catch(() => {}); } catch (e) {} }
+    clearInterval(this.timer); this.timer = null; this.doc = null;
+    const st = $('vidStage'); if (st) st.classList.add('hidden');
+  },
+  stage() {
+    let st = $('vidStage'); if (st) { st.classList.remove('hidden'); return st; }
+    st = document.createElement('div'); st.id = 'vidStage'; st.className = 'vid-stage';
+    st.innerHTML = `<div class="vid-frame"><div class="vid-box"><div id="ytPlayer"></div><div class="vid-msg hidden" id="vidMsg"></div></div></div>
+      <div class="vid-bar">
+        <button class="btn ghost icon vb-play" title="Lecture / pause (⌥K)"></button>
+        <button class="btn ghost sm vb-back" title="Reculer de 5 secondes (⌥J)">−5</button>
+        <span class="vb-time">0:00</span>
+        <div class="vb-track" title="Aller à ce moment ; les points sont tes notes"><div class="vb-fill"></div><div class="vb-marks"></div></div>
+        <button class="btn ghost sm vb-fwd" title="Avancer de 5 secondes">+5</button>
+        <button class="btn ghost sm vb-rate" title="Vitesse de lecture">1×</button>
+        <button class="btn sm vb-tc" title="Nouvelle note à ce moment, avec le minutage (⌥T)">⏱ Note ici</button>
+      </div>
+      <div class="vid-opts small">
+        <label class="switch"><input type="checkbox" id="vidAutoPause"> Pause quand j'écris</label>
+        <label class="switch"><input type="checkbox" id="vidAutoResume"> Reprendre après la note</label>
+        <span class="vid-keys">⌥K lecture/pause · ⌥J −5 s · ⌥T minutage</span>
+      </div>`;
+    $('viewer').appendChild(st);
+    st.querySelector('.vb-play').onclick = () => this.toggle();
+    st.querySelector('.vb-back').onclick = () => this.skip(-5);
+    st.querySelector('.vb-fwd').onclick = () => this.skip(5);
+    st.querySelector('.vb-rate').onclick = () => { const R = [1, 1.25, 1.5, 1.75, 2, 0.75]; this.rate = R[(R.indexOf(this.rate) + 1) % R.length]; try { this.p.setPlaybackRate(this.rate); } catch (e) {} this.ui(); };
+    st.querySelector('.vb-tc').onclick = () => this.noteHere();
+    st.querySelector('.vb-track').onclick = (e) => { const dot = e.target.closest('[data-n]'); if (dot) { this.seek(+dot.dataset.t, true); const c = document.querySelector(`.note[data-id="${dot.dataset.n}"]`); if (c) { c.scrollIntoView({ block: 'nearest' }); c.classList.add('flash'); setTimeout(() => c.classList.remove('flash'), 1200); } return; } const b = e.currentTarget.getBoundingClientRect(); const dur = this.dur(); if (dur) this.seek((e.clientX - b.left) / b.width * dur); };
+    const ap = st.querySelector('#vidAutoPause'), ar = st.querySelector('#vidAutoResume');
+    ap.checked = prefs.vidAutoPause !== false; ar.checked = prefs.vidAutoResume !== false;
+    ap.onchange = () => { prefs.vidAutoPause = ap.checked; savePrefs(); }; ar.onchange = () => { prefs.vidAutoResume = ar.checked; savePrefs(); };
+    return st;
+  },
+  msg(html) { const m = $('vidMsg'); if (!m) return; m.innerHTML = html || ''; m.classList.toggle('hidden', !html); },
+  loadApi() {
+    if (window.YT && window.YT.Player) return Promise.resolve();
+    if (this._api) return this._api;
+    this._api = new Promise((res, rej) => {
+      const prev = window.onYouTubeIframeAPIReady; window.onYouTubeIframeAPIReady = () => { try { prev && prev(); } catch (e) {} res(); };
+      const s = document.createElement('script'); s.src = 'https://www.youtube.com/iframe_api'; s.async = true;
+      s.onerror = () => { this._api = null; rej(new Error('net')); }; document.head.appendChild(s);
+      setTimeout(() => { if (!(window.YT && window.YT.Player)) { this._api = null; rej(new Error('timeout')); } }, 20000);
+    });
+    return this._api;
+  },
+  async mount(d) {
+    this.stage(); this.msg(''); this.err = ''; this.marksN = -1;
+    clearInterval(this.timer); this.timer = setInterval(() => this.tick(), 500);
+    try { await this.loadApi(); }
+    catch (e) { this.msg('<b>YouTube est inaccessible.</b><br>Vérifie ta connexion internet : les vidéos YouTube demandent d\'être en ligne. Tes notes restent disponibles à droite.'); return; }
+    if (this.doc !== d) return;
+    const start = Math.floor(d.lastT || 0);
+    if (this.p && this.ready) { try { this.p.cueVideoById({ videoId: d.vid, startSeconds: start }); this.afterLoad(d); } catch (e) {} return; }
+    if (this.p) return;
+    this.ready = false;
+    const vars = { rel: 0, playsinline: 1, modestbranding: 1, start };
+    if (/^https?:$/.test(location.protocol)) vars.origin = location.origin;
+    this.p = new YT.Player('ytPlayer', { width: '100%', height: '100%', videoId: d.vid, playerVars: vars,
+      events: {
+        onReady: () => { this.ready = true; try { this.p.setPlaybackRate(this.rate); } catch (e) {} if (this.doc) { const want = this.doc.vid; const cur = (this.p.getVideoData && this.p.getVideoData() || {}).video_id; if (cur && cur !== want) this.p.cueVideoById({ videoId: want, startSeconds: Math.floor(this.doc.lastT || 0) }); this.afterLoad(this.doc); } },
+        onStateChange: (e) => { if (e.data === 1) { this.autoPaused = false; this.msg(''); if (this.doc) this.afterLoad(this.doc); } this.ui(); },
+        onError: (e) => { const c = e && e.data; this.err = String(c);
+          this.msg(c === 101 || c === 150 ? `<b>Le propriétaire de cette vidéo n'autorise pas sa lecture en dehors de YouTube.</b><br>Ouvre-la sur YouTube (<a href="${this.link(this.doc || d, this.time())}" target="_blank" rel="noopener">lien</a>) et prends tes notes ici ; le minutage ne pourra pas être lu automatiquement.`
+            : c === 100 ? '<b>Vidéo introuvable ou privée.</b>'
+            : c === 153 || !/^https?:$/.test(location.protocol) ? '<b>YouTube refuse de s\'afficher dans le fichier hors ligne de l\'Atelier.</b><br>Ouvre l\'Atelier depuis sa version en ligne pour regarder des vidéos.'
+            : '<b>Cette vidéo ne peut pas être lue ici</b> (code ' + esc(String(c)) + ').'); } } });
+  },
+  afterLoad(d) {
+    try { const vd = this.p.getVideoData ? this.p.getVideoData() : null; let ch = false;
+      if (vd && vd.title && (!d.title || d.title === 'Vidéo YouTube')) { d.title = vd.title; ch = true; if (this.doc === S.doc) $('docTitle').value = d.title; renderTabs(); }
+      if (vd && vd.author && d.author !== vd.author) { d.author = vd.author; ch = true; }
+      const du = this.p.getDuration ? this.p.getDuration() : 0; if (du && Math.abs((d.dur || 0) - du) > 1) { d.dur = du; ch = true; this.marksN = -1; }
+      if (ch) saveDocObj(d);
+    } catch (e) {}
+  },
+  time() { try { if (this.p && this.ready) return this.p.getCurrentTime() || 0; } catch (e) {} return (this.doc && this.doc.lastT) || 0; },
+  dur() { try { if (this.p && this.ready) return this.p.getDuration() || (this.doc && this.doc.dur) || 0; } catch (e) {} return (this.doc && this.doc.dur) || 0; },
+  playing() { try { return !!(this.p && this.ready && this.p.getPlayerState() === 1); } catch (e) { return false; } },
+  play() { try { this.p && this.p.playVideo(); } catch (e) {} this.autoPaused = false; },
+  pause(auto) { if (!this.playing()) return; try { this.p.pauseVideo(); } catch (e) {} this.autoPaused = !!auto; this.ui(); },
+  toggle() { if (this.playing()) this.pause(false); else this.play(); setTimeout(() => this.ui(), 120); },
+  skip(dt) { this.seek(Math.max(0, this.time() + dt)); },
+  seek(t, play) { try { this.p.seekTo(Math.max(0, t), true); if (play) this.play(); } catch (e) {} if (this.doc) this.doc.lastT = t; setTimeout(() => this.ui(), 120); },
+  tc(t) { return `<span class="tc" data-t="${Math.floor(t)}" contenteditable="false">${fmtT(t)}</span>&nbsp;`; },
+  // ⌥T : minutage dans la note en cours, sinon nouvelle note à ce moment
+  insertTc() {
+    if (!this.active()) return;
+    const t = this.time(); const a = document.activeElement;
+    if (a && a.classList && a.classList.contains('body') && $('notesList').contains(a)) {
+      const sel = getSelection(); if (!sel.rangeCount || !a.contains(sel.anchorNode)) { placeCaretEnd(a); }
+      const r = getSelection().getRangeAt(0); r.deleteContents();
+      const span = document.createElement('span'); span.className = 'tc'; span.dataset.t = Math.floor(t); span.contentEditable = 'false'; span.textContent = fmtT(t);
+      const sp = document.createTextNode('\u00a0'); r.insertNode(sp); r.insertNode(span); r.setStartAfter(sp); r.collapse(true);
+      getSelection().removeAllRanges(); getSelection().addRange(r); a.dispatchEvent(new Event('input', { bubbles: true })); return;
+    }
+    if (a === $('quick')) { const q = $('quick'); const s = q.selectionStart || 0; const ins = '[' + fmtT(t) + '] '; q.value = q.value.slice(0, s) + ins + q.value.slice(q.selectionEnd || s); q.selectionStart = q.selectionEnd = s + ins.length; return; }
+    this.noteHere();
+  },
+  noteHere() {
+    if (!this.active()) return;
+    if (prefs.vidAutoPause !== false) this.pause(true);
+    const n = addNote({ html: '<div>' + this.tc(this.time()) + '</div>' });
+    if (n) { const c = document.querySelector(`.note[data-id="${n.id}"] .body`); if (c) { c.querySelectorAll('.tc').forEach(x => x.setAttribute('contenteditable', 'false')); placeCaretEnd(c); } }
+  },
+  tick() {
+    if (!this.active()) return;
+    const t = this.time();
+    $('quick').placeholder = `Note rapide · ${fmtT(t)} (Entrée)`;
+    if (Date.now() - this.lastSave > 5000 && this.ready) { this.lastSave = Date.now(); if (Math.abs((this.doc.lastT || 0) - t) > 1) { this.doc.lastT = t; saveSoon(true); } }
+    this.ui();
+  },
+  ui() {
+    const st = $('vidStage'); if (!st || !this.doc) return;
+    const t = this.time(), du = this.dur(), pl = this.playing();
+    st.querySelector('.vb-play').innerHTML = pl ? '<svg class="i" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></svg>' : '<svg class="i" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+    st.querySelector('.vb-time').textContent = fmtT(t) + (du ? ' / ' + fmtT(du) : '');
+    st.querySelector('.vb-rate').textContent = String(this.rate).replace('.', ',') + '×';
+    st.querySelector('.vb-fill').style.width = du ? Math.min(100, t / du * 100) + '%' : '0';
+    const notes = this.doc.notes.filter(n => n.t != null);
+    const key = notes.length + ':' + Math.round(du) + ':' + notes.reduce((s, n) => s + (n.t | 0), 0);
+    if (key !== this.marksN && du) { this.marksN = key; st.querySelector('.vb-marks').innerHTML = notes.map(n => `<i data-n="${n.id}" data-t="${n.t}" style="left:${Math.min(100, n.t / du * 100)}%" title="${esc(fmtT(n.t) + (n.title ? ' · ' + n.title : ''))}"></i>`).join(''); }
+  },
+  sorted(d) { return d.notes.slice().sort((a, b) => (a.t ?? 1e9) - (b.t ?? 1e9) || a.created - b.created); },
+  mdBody(d, n) { const box = document.createElement('div'); box.innerHTML = sanitize(n.html || ''); box.querySelectorAll('.tc').forEach(x => x.replaceWith('[' + x.textContent + '](' + this.link(d, +x.dataset.t) + ')')); return htmlToMd(box.innerHTML); },
+  exportMd(d) {
+    if (!d.notes.length) return toast('Aucune note à exporter pour cette vidéo.');
+    let md = `# ${d.title}\n\n*Notes personnelles · ${today()} · vidéo : ${this.link(d)}${d.author ? ' (' + d.author + ')' : ''} · ${d.notes.length} notes. Les minutages renvoient à la vidéo.*\n`;
+    this.sorted(d).forEach(n => { md += `\n### ${n.t != null ? '[' + fmtT(n.t) + '](' + this.link(d, n.t) + ') · ' : ''}${n.title || '(sans titre)'}\n`; if (n.tags.length) md += `*Étiquettes : ${n.tags.map(tagLabel).join(', ')}*\n`; const b = this.mdBody(d, n); if (b) md += '\n' + b + '\n'; });
+    downloadBlob(safeName(d.title) + ' - notes.md', md, 'text/markdown;charset=utf-8');
+    toast('Fichier .md téléchargé.', { duration: 3000 });
+  },
+  claudeMd(d, opt) {
+    const since = opt.since || 0; const date = new Date().toLocaleDateString('fr-BE', { day: 'numeric', month: 'long', year: 'numeric' });
+    const notes = this.sorted(d).filter(n => !n.private && (n.updated || n.created || 1) > since && (n.title || htmlText(n.html).trim()));
+    const peers = opt.peers ? peersOf(d).flatMap(pe => (pe.notes || []).filter(n => (n.updated || n.created || 1) > since).map(n => ({ n, who: pe.name }))) : [];
+    let md = `# Notes à intégrer dans la synthèse — ${d.title}\n\n*Prises avec l'Atelier d'étude le ${date} en regardant la vidéo ${this.link(d)}${d.author ? ' (' + d.author + ')' : ''}. Les minutages renvoient à cette vidéo.${since ? ' Seules les notes ajoutées ou modifiées depuis le ' + new Date(since).toLocaleDateString('fr-BE') + ' sont incluses.' : ''}*\n\n`;
+    md += `## Consignes pour Claude\n\nIntègre ces notes dans la synthèse de cette vidéo en respectant son code couleur : **noir** pour le contenu de la vidéo, **rouge** pour tes propres ajouts, toujours signalés, **violet italique** pour mes notes personnelles (**[MA NOTE]**), à intégrer sans les reformuler sur le fond${peers.length ? ' ; les **[NOTE DE …]** viennent de mes collègues, en violet aussi avec leur prénom' : ''}. Les **[QUESTION POUR LE PROF]** et **[À VÉRIFIER]** ne sont pas des faits : regroupe-les dans une rubrique « Points à vérifier » à la fin. Ne supprime rien de la synthèse existante sans me le signaler.\n\n## Notes dans l'ordre de la vidéo\n`;
+    const one = (n, who) => {
+      const tags = n.tags.filter(t => t !== 'question' && t !== 'verifier');
+      const kind = n.tags.includes('question') ? 'QUESTION POUR LE PROF' : n.tags.includes('verifier') ? 'À VÉRIFIER' : who ? 'NOTE DE ' + who.toUpperCase() : 'MA NOTE';
+      let o = `\n### ${n.t != null ? '[' + fmtT(n.t) + '](' + this.link(d, n.t) + ') ' : ''}**[${kind}]**${n.title ? ' ' + n.title.trim() : ''}${tags.length ? ' · *' + tags.map(tagLabel).join(', ') + '*' : ''}\n`;
+      const b = this.mdBody(d, n); if (b.trim()) o += '\n' + b.trim().split('\n').map(l => l ? '> ' + l : '>').join('\n') + '\n';
+      return o;
+    };
+    const all = notes.map(n => ({ n, who: null })).concat(peers).sort((a, b) => (a.n.t ?? 1e9) - (b.n.t ?? 1e9));
+    all.forEach(x => { md += one(x.n, x.who); });
+    const qs = notes.filter(n => n.tags.includes('question') || n.tags.includes('verifier'));
+    if (qs.length) md += `\n## Récapitulatif : questions et points à vérifier\n\n` + qs.map(n => `- ${n.t != null ? fmtT(n.t) + ' · ' : ''}${n.tags.includes('question') ? 'Question pour le prof' : 'À vérifier'} : ${cleanTxt(n.title) || clip(htmlText(n.html).trim(), 140)}`).join('\n') + '\n';
+    return { md, imgs: [], count: { notes: notes.length, hls: 0, peers: peers.length, pages: notes.length ? 1 : 0, imgs: 0, trans: 0 } };
+  },
+};
+// La vidéo se met en pause quand on écrit, et repart après la note si on le souhaite
+document.addEventListener('keydown', (e) => {
+  if (!Vid.active() || e.altKey || e.metaKey || e.ctrlKey) return;
+  const tg = e.target; const inNotes = tg && $('notesPane').contains(tg) && (tg.isContentEditable || tg.tagName === 'TEXTAREA' || tg.tagName === 'INPUT') && tg.id !== 'noteSearch';
+  if (!inNotes) return;
+  if (e.key === 'Escape') { if (Vid.autoPaused && prefs.vidAutoResume !== false) setTimeout(() => Vid.play(), 60); return; }
+  if (tg.id === 'quick' && e.key === 'Enter' && !e.shiftKey) { if (Vid.autoPaused && prefs.vidAutoResume !== false && tg.value.trim()) setTimeout(() => Vid.play(), 120); return; }
+  if (prefs.vidAutoPause !== false && (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Enter') && Vid.playing()) Vid.pause(true);
+}, true);
+document.addEventListener('click', (e) => { const tc = e.target.closest && e.target.closest('#notesList .tc'); if (!tc || !Vid.active()) return; e.preventDefault(); Vid.seek(+tc.dataset.t, true); });
+window.Vid = Vid;
+
 /* =================== Clavier global =================== */
 document.addEventListener('keydown', (e) => {
   const t = e.target; const editing = t.isContentEditable || /INPUT|TEXTAREA|SELECT/.test(t.tagName);
@@ -5203,6 +5466,12 @@ document.addEventListener('keydown', (e) => {
   if (e.altKey && !cmd && S.doc) {
     const c = e.code;
     if (c === 'KeyN') { e.preventDefault(); addNote(); return; }
+    if (S.doc.kind === 'video') {
+      if (c === 'KeyK') { e.preventDefault(); Vid.toggle(); return; }
+      if (c === 'KeyJ') { e.preventDefault(); Vid.skip(-5); return; }
+      if (c === 'KeyT') { e.preventDefault(); Vid.insertTc(); return; }
+      if (['KeyE', 'KeyC', 'KeyD', 'KeyA', 'KeyL', 'KeyM'].includes(c)) { e.preventDefault(); return; }
+    }
     if (c === 'KeyM') { e.preventDefault(); if (Rec.on) Rec.stop(); else if (prefs.recSeen) Rec.start(); else RecUI.click(); return; }
     if (c === 'KeyE') { e.preventDefault(); startMode('pin'); return; }
     if (c === 'KeyC') { e.preventDefault(); startMode('capture'); return; }
@@ -5216,6 +5485,11 @@ document.addEventListener('keydown', (e) => {
   }
   if (editing || modalEl) return;
   if (e.key === '?') { e.preventDefault(); openHelp(); return; }
+  if (Vid.active() && !cmd) {
+    if (e.key === ' ' || e.key === 'k') { e.preventDefault(); Vid.toggle(); return; }
+    if (e.key === 'ArrowLeft' || e.key === 'j') { e.preventDefault(); Vid.skip(-5); return; }
+    if (e.key === 'ArrowRight' || e.key === 'l') { e.preventDefault(); Vid.skip(5); return; }
+  }
   if (!S.pdf) return;
   if (e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); goTo(S.current + 1); }
   else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); goTo(S.current - 1); }
@@ -5254,6 +5528,9 @@ document.addEventListener('keydown', (e) => {
     pb.querySelector('.pb-rate').onclick = () => { const R = [1, 1.25, 1.5, 1.75, 2, 0.75]; Player.rate = R[(R.indexOf(Player.rate) + 1) % R.length]; if (Player.el) Player.el.playbackRate = Player.rate; Player.ui(); };
     pb.querySelector('.pb-track').onclick = (e) => { if (!Player.r) return; const b = e.currentTarget.getBoundingClientRect(); Player.play(Player.d, Player.r, (e.clientX - b.left) / b.width * Player.r.dur); }; }
   RecUI.sync(); TQ.restore();
+  $('vidBtn2').onclick = () => Vid.ask(); $('vidItem').onclick = () => { closeDD(); Vid.ask(); };
+  $('tcBtn').onclick = () => Vid.insertTc();
+  document.addEventListener('paste', (e) => { if (isEditingNote() || (document.activeElement && /INPUT|TEXTAREA/.test(document.activeElement.tagName)) || modalEl) return; const t = (e.clipboardData && e.clipboardData.getData('text')) || ''; const r = Vid.parse(t); if (r && /youtu/.test(t)) { e.preventDefault(); Vid.open(r.id, r.t); } });
   // ouverture différée depuis la bibliothèque
   const orig = openFile;
   window.__atelier = { S, DB, Backup, FC, openFile, mergeBackup, htmlToMd, exportMd, renderNotes, prefs, savePrefs };

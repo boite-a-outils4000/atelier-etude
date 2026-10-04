@@ -1,6 +1,6 @@
 # Atelier d'étude
 
-Ton cours en PDF à gauche, tes notes à droite. Annoter, prendre des notes, enregistrer et transcrire le cours, réviser (QCM à degrés de certitude, séance du jour, bilan), travailler à plusieurs.
+Ton cours en PDF à gauche, tes notes à droite. Annoter, prendre des notes (aussi sur une vidéo YouTube, avec le minutage), enregistrer et transcrire le cours, réviser (QCM à degrés de certitude, séance du jour, bilan), travailler à plusieurs.
 
 **Utiliser l'application : https://boite-a-outils4000.github.io/atelier-etude/**
 
