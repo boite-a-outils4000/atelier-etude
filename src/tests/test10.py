@@ -113,8 +113,8 @@ async def main():
             await page.click('#expBtn'); await page.click('#ddExport [data-x="md"]')
         dl = await d.value; md = open(await dl.path(), encoding='utf-8').read()
         ok('exporter .md', 'Six enseignements' in md, dl.suggested_filename)
-        await page.click('#expBtn'); await page.click('#ddExport [data-x="notes"]'); await page.wait_for_timeout(900)
-        ok('exporter « Mes notes seules » (impression)', await ev('window.__printed||0') >= 1)
+        await page.click('#expBtn'); await page.click('#ddExport [data-x="notes"]'); await page.click('#npGo'); await page.wait_for_timeout(900)
+        ok('exporter « Mes notes en PDF » (impression)', await ev('window.__printed||0') >= 1)
         async with page.expect_download() as d:
             await page.click('#coursBtn'); await page.click('#ddCours [data-x="json"]')
         dl = await d.value; bj = json.load(open(await dl.path(), encoding='utf-8'))

@@ -984,7 +984,7 @@ body.tb-c6 .tb-center .ctl-group + .ctl-group { display: none; } body.tb-c6 .doc
 .vid-opts .vid-keys { margin-left: auto; }
 body.vid #pages, body.vid #thumbs, body.vid #thumbsBtn, body.vid .tb-center .ctl-group, body.vid .tb-center > .dd, body.vid #searchBox,
 body.vid #recBtn, body.vid #recItem, body.vid #readBtn, body.vid #tabPage, body.vid #quoteBtn, body.vid #addPinNote,
-body.vid #ddExport [data-x="sbs"], body.vid #ddExport [data-x="annot"], body.vid #ddExport [data-x="notes"], body.vid #ddBlock [data-ins="capture"], body.vid .note .pbadge { display: none !important; }
+body.vid #ddExport [data-x="sbs"], body.vid #ddExport [data-x="annot"], body.vid #ddBlock [data-ins="capture"], body.vid .note .pbadge { display: none !important; }
 .tc { display: inline-block; font: 600 0.82em var(--ui); font-variant-numeric: tabular-nums; color: #6b45b8; background: rgba(138,92,214,.12); border-radius: 5px; padding: 0 5px; cursor: pointer; white-space: nowrap; }
 .tc::before { content: "▶ "; font-size: .8em; }
 .tc:hover { background: rgba(138,92,214,.22); }
@@ -999,7 +999,7 @@ body.vid #ddExport [data-x="sbs"], body.vid #ddExport [data-x="annot"], body.vid
 body.nb .main:not(.focus-notes):not(.focus-pdf) { grid-template-columns: min(34%, 420px) 7px 1fr !important; }
 body.nb #pages, body.nb #thumbs, body.nb #thumbsBtn, body.nb .tb-center .ctl-group, body.nb .tb-center > .dd, body.nb #searchBox,
 body.nb #readBtn, body.nb #tabPage, body.nb #quoteBtn, body.nb #addPinNote,
-body.nb #ddExport [data-x="sbs"], body.nb #ddExport [data-x="annot"], body.nb #ddExport [data-x="notes"], body.nb #ddBlock [data-ins="capture"], body.nb .note .pbadge { display: none !important; }
+body.nb #ddExport [data-x="sbs"], body.nb #ddExport [data-x="annot"], body.nb #ddBlock [data-ins="capture"], body.nb .note .pbadge { display: none !important; }
 .nb-stage { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 28px 22px; background: var(--viewer-bg); overflow: auto; z-index: 2; }
 .nb-card { max-width: 380px; text-align: center; color: var(--ink); }
 .nb-card h2 { font: 700 20px var(--ui); margin: 10px 0 8px; }
@@ -1033,6 +1033,12 @@ body.nb #ddExport [data-x="sbs"], body.nb #ddExport [data-x="annot"], body.nb #d
 /* ===== v13 : texte justifié ===== */
 body.justify .notes-list .body, body.justify #print .body, body.justify .fc-card .body { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
 body.justify .notes-list .body h2, body.justify .notes-list .body h3, body.justify #print .body h2, body.justify #print .body h3 { text-align: left; hyphens: manual; }
+/* ===== v14 : export PDF des notes ===== */
+#print .pn.brk ~ .pn.brk { break-before: page; }
+#print .brk-before { break-before: page; }
+#print .pmeta { font: 700 9pt "Nunito", sans-serif; color: #6b45b8; margin: 0 0 1pt; }
+#print .pmeta a, #print a.tc { color: #6b45b8; text-decoration: none; }
+#print .trp { font-size: 10pt; line-height: 1.45; margin: 0 0 6pt; }
 /* Mouvement réduit */
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
@@ -1122,7 +1128,7 @@ body.justify .notes-list .body h2, body.justify .notes-list .body h3, body.justi
 <div class="dd-menu wide" id="ddExport">
   <h5>Pour réviser</h5>
   <button data-x="sbs"><span class="tx">Cours + notes côte à côte<span class="d">Chaque page du cours avec tes notes à droite (PDF)</span></span></button>
-  <button data-x="notes"><span class="tx">Mes notes seules<span class="d">Notes classées par page, avec les captures (PDF)</span></span></button>
+  <button data-x="notes"><span class="tx">Mes notes en PDF<span class="d">Toutes, une page ou un filtre ; avec les captures</span></span></button>
   <button data-x="annot"><span class="tx">PDF du cours annoté<span class="d">Notes et surlignages en commentaires (Skim, Aperçu, Acrobat)</span></span></button>
   <hr><h5>Pour Claude ou un autre outil</h5>
   <button data-x="claude"><span class="tx">Envoyer à Claude…<span class="d">Pour intégrer tes notes dans ta synthèse, avec le code couleur</span></span></button>
@@ -2064,6 +2070,7 @@ function noteMenu(n, anchor) {
     <button data-a="merge">Fusionner avec la note suivante</button>
     <button data-a="card">${n.srs ? 'Remettre la fiche à zéro' : 'Ajouter aux fiches'}</button>
     <button data-a="lt">Vérifier orthographe et grammaire…</button>
+    <button data-a="pdf">Exporter cette note en PDF</button>
     <button data-a="private">${n.private ? '🔓 Rendre partageable' : '🔒 Note privée (jamais partagée)'}</button>
     <hr><button data-a="del" style="color:var(--danger)">Supprimer</button>`;
   closeDD(); m.classList.add('open'); openDD = m;
@@ -2077,6 +2084,7 @@ function noteMenu(n, anchor) {
     else if (a === 'dup') { const c = JSON.parse(JSON.stringify(n)); c.id = uid(); c.created = c.updated = Date.now(); c.title = (c.title || '') + ' (copie)'; delete c.srs; delete c.pin; S.doc.notes.push(c); saveSoon(); renderNotes(); updateBadges(); }
     else if (a === 'private') { n.private = !n.private; n.updated = Date.now(); saveSoon(); renderNotes(); toast(n.private ? 'Note privée : elle ne sera jamais incluse dans un partage.' : 'Cette note pourra être partagée.'); }
     else if (a === 'lt') Gram.check(n);
+    else if (a === 'pdf') NotesPdf.open(n);
     else if (a === 'card') { n.srs = { box: 1, due: Date.now() }; saveSoon(); renderNotes(); toast('Fiche prête : elle apparaîtra dans « Fiches ».'); }
     else if (a === 'del') deleteNote(n);
   };
@@ -3188,7 +3196,7 @@ function onExportMenu(e) {
   if (!S.doc) return toast('Ouvre d\'abord un cours.');
   if (x === 'md') return exportMd(S.doc);
   if (x === 'claude') return ToClaude.open();
-  if (x === 'notes') return exportNotesPdf();
+  if (x === 'notes') return NotesPdf.open();
   if (x === 'sbs') return sbsDialog();
   if (x === 'annot') return exportAnnotated();
   if (x === 'share') return openShare();
@@ -5865,6 +5873,66 @@ const Gram = {
   },
 };
 window.Arrows = Arrows; window.Gram = Gram;
+
+
+/* =================== Exporter les notes en PDF (avec choix) =================== */
+const NotesPdf = {
+  open(one) {
+    const d = S.doc; if (!d) return;
+    if (one) return this.make(d, [one], { hl: false, tr: false, one: true });
+    if (!d.notes.length && !d.highlights.length) return toast('Aucune note à exporter.');
+    const flat = flatDoc(d); const pageN = d.notes.filter(n => n.page === S.current).length;
+    const filt = S.filters.size ? d.notes.filter(n => n.tags.some(t => S.filters.has(t))).length : 0;
+    const hasTr = (d.recs || []).some(r => (r.segs || []).length);
+    const m = openModal('Exporter mes notes en PDF', `
+      <div class="field"><span class="lbl">Quelles notes ?</span><div class="seg" id="npScope"><button data-v="all" class="on">Toutes (${d.notes.length})</button>${!flat ? `<button data-v="page">Page ${S.current} (${pageN})</button>` : ''}${filt ? `<button data-v="filt">Filtre actuel (${filt})</button>` : ''}</div></div>
+      <div class="field"><span class="lbl">Inclure</span>
+        ${!flat && d.highlights.length ? '<div style="padding:3px 0"><label class="switch"><input type="checkbox" id="npHl" checked> Les passages surlignés</label></div>' : ''}
+        <div style="padding:3px 0"><label class="switch"><input type="checkbox" id="npTags" checked> Les étiquettes</label></div>
+        <div style="padding:3px 0"><label class="switch"><input type="checkbox" id="npPriv" checked> Mes notes privées 🔒</label></div>
+        ${hasTr ? '<div style="padding:3px 0"><label class="switch"><input type="checkbox" id="npTr"> La transcription du cours, à la fin</label></div>' : ''}
+        <div style="padding:3px 0"><label class="switch"><input type="checkbox" id="npBreak"> Une note par page</label></div></div>
+      <p class="small">La fenêtre d'impression va s'ouvrir : choisis « Enregistrer au format PDF » comme imprimante.</p>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px"><button class="btn" data-close2>Annuler</button><button class="btn primary" id="npGo">Créer le PDF</button></div>`, 'sm');
+    const sc = m.querySelector('#npScope'); sc.onclick = (e) => { const b = e.target.closest('button'); if (b) sc.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); };
+    m.querySelector('[data-close2]').onclick = closeModal;
+    m.querySelector('#npGo').onclick = () => {
+      const v = sc.querySelector('.on').dataset.v; const ck = (id) => !!(m.querySelector('#' + id) || {}).checked;
+      let notes = d.notes.slice();
+      if (v === 'page') notes = notes.filter(n => n.page === S.current);
+      if (v === 'filt') notes = notes.filter(n => n.tags.some(t => S.filters.has(t)));
+      if (!ck('npPriv')) notes = notes.filter(n => !n.private);
+      closeModal(); this.make(d, notes, { hl: ck('npHl'), tags: ck('npTags'), tr: ck('npTr'), brk: ck('npBreak'), page: v === 'page' ? S.current : 0 });
+    };
+  },
+  block(d, n, o) {
+    let meta = '';
+    if (d.kind === 'video' && n.t != null) meta = `<a class="tl" href="${Vid.link(d, n.t)}">▶ ${fmtT(n.t)}</a>`;
+    else if (d.kind === 'blank') meta = `<span class="tl">${new Date(n.created).toLocaleTimeString('fr-BE', { hour: '2-digit', minute: '2-digit' })}</span>`;
+    const tags = o.tags !== false && n.tags.length ? `<div class="tg">${n.tags.map(tagLabel).join(' · ')}</div>` : '';
+    const box = document.createElement('div'); box.innerHTML = sanitize(n.html || '');
+    if (d.kind === 'video') box.querySelectorAll('.tc').forEach(x => { const a = document.createElement('a'); a.className = 'tc'; a.href = Vid.link(d, +x.dataset.t); a.textContent = x.textContent; x.replaceWith(a); });
+    return `<div class="pn${o.brk ? ' brk' : ''}">${meta ? `<div class="pmeta">${meta}</div>` : ''}<h3>${esc(n.title) || '<span style="color:#9aa4a9">(sans titre)</span>'}</h3>${tags}<div class="body">${box.innerHTML}</div></div>`;
+  },
+  make(d, notes, o) {
+    if (!notes.length && !(o.hl && d.highlights.length)) return toast('Aucune note à exporter avec ces choix.');
+    const what = o.one ? 'Note' : o.page ? `Mes notes · page ${o.page}` : 'Mes notes';
+    const src = d.kind === 'video' ? ` · vidéo : <a href="${Vid.link(d)}">${esc(Vid.link(d))}</a>` : d.kind === 'blank' ? ' · carnet' : '';
+    let h = `<div class="doc-h"><h1>${esc(d.title)}</h1><div class="meta">${what} · ${today()} · ${notes.length} note${notes.length > 1 ? 's' : ''}${src}</div></div>`;
+    if (d.kind === 'video') h += Vid.sorted({ notes }).map(n => this.block(d, n, o)).join('');
+    else if (d.kind === 'blank') h += Nb.sorted({ notes }).map(n => this.block(d, n, o)).join('');
+    else {
+      const hls = o.hl ? d.highlights.filter(x => !o.page || x.page === o.page) : [];
+      const pages = [...new Set([...notes.map(n => n.page), ...hls.map(x => x.page)])].sort((a, b) => a - b);
+      const sorted = sortedNotes({ notes });
+      pages.forEach(p => { h += (o.one ? '' : `<h2 class="pg">Page ${p}</h2>`) + hls.filter(x => x.page === p).map(hlBlockPrint).join('') + sorted.filter(n => n.page === p).map(n => this.block(d, n, o)).join(''); });
+    }
+    if (o.tr) (d.recs || []).filter(r => (r.segs || []).length).forEach(r => { h += `<h2 class="pg brk-before">Transcription · ${esc(r.title)}</h2>` + Trans.text(r, false).split('\n\n').filter(Boolean).map(p => `<p class="trp">${esc(p).replace(/\n/g, '<br>')}</p>`).join(''); });
+    doPrint(h, false, d.title + (o.one ? ' - ' + (notes[0].title || 'note') : ' - notes'));
+    toast('Dans la fenêtre d\'impression, choisis « Enregistrer au format PDF ».', { duration: 5000 });
+  },
+};
+window.NotesPdf = NotesPdf;
 
 /* =================== Clavier global =================== */
 document.addEventListener('keydown', (e) => {
