@@ -995,6 +995,23 @@ body.vid #ddExport [data-x="sbs"], body.vid #ddExport [data-x="annot"], body.vid
 .home-vid { margin-top: 10px; }
 
 .vid-only { display: none !important; } body.vid .vid-only { display: inline-flex !important; }
+/* ===== v10 : carnet vierge, abréviations ===== */
+body.nb .main:not(.focus-notes):not(.focus-pdf) { grid-template-columns: min(34%, 420px) 7px 1fr !important; }
+body.nb #pages, body.nb #thumbs, body.nb #thumbsBtn, body.nb .tb-center .ctl-group, body.nb .tb-center > .dd, body.nb #searchBox,
+body.nb #readBtn, body.nb #tabPage, body.nb #quoteBtn, body.nb #addPinNote,
+body.nb #ddExport [data-x="sbs"], body.nb #ddExport [data-x="annot"], body.nb #ddExport [data-x="notes"], body.nb #ddBlock [data-ins="capture"], body.nb .note .pbadge { display: none !important; }
+.nb-stage { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 28px 22px; background: var(--viewer-bg); overflow: auto; z-index: 2; }
+.nb-card { max-width: 380px; text-align: center; color: var(--ink); }
+.nb-card h2 { font: 700 20px var(--ui); margin: 10px 0 8px; }
+.nb-card p { line-height: 1.5; margin: 0 0 8px; }
+.nb-ico { width: 54px; height: 54px; border-radius: 14px; background: var(--accent-soft); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; }
+.nb-ico .i { width: 28px; height: 28px; }
+.nb-acts { display: flex; flex-direction: column; gap: 8px; margin: 16px 0 14px; }
+.nb-acts .btn { justify-content: center; gap: 8px; height: 38px; }
+.nb-tip { color: var(--muted); }
+.lnkbtn { border: 0; background: none; padding: 0; color: var(--accent); text-decoration: underline; cursor: pointer; font: inherit; }
+.home-nb { margin-top: 6px; }
+
 /* Mouvement réduit */
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
@@ -1066,6 +1083,7 @@ body.vid #ddExport [data-x="sbs"], body.vid #ddExport [data-x="annot"], body.vid
   <h5>Mes cours</h5>
   <button id="libBtn"><span class="ico"><svg class="i" viewBox="0 0 24 24"><path d="M4 19V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zm0 0a2 2 0 0 0 2 2h13"/></svg></span><span class="tx">Bibliothèque<span class="d">Tous les cours annotés</span></span></button>
   <button data-c="open"><span class="ico"><svg class="i" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span><span class="tx">Ouvrir un PDF…</span><span class="k kbd">⌘O</span></button>
+  <button id="nbItem"><span class="ico"><svg class="i" viewBox="0 0 24 24"><path d="M6 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6z"/><path d="M6 3v18M9.5 8h6M9.5 12h6"/></svg></span><span class="tx">Nouveau carnet sans document<span class="d">Pour un cours sans support ; à rattacher au PDF plus tard</span></span></button>
   <button id="vidItem"><span class="ico"><svg class="i" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="3.5"/><path d="M10 9.2v5.6l4.8-2.8z"/></svg></span><span class="tx">Ouvrir une vidéo YouTube…<span class="d">Notes avec le minutage, pause automatique</span></span></button>
   <button data-c="close" class="needdoc-item"><span class="ico"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></span><span class="tx">Fermer ce cours<span class="d">Retour à l'accueil ; tes notes restent enregistrées</span></span></button>
   <hr><h5>Pendant le cours</h5>
@@ -1109,6 +1127,7 @@ body.vid #ddExport [data-x="sbs"], body.vid #ddExport [data-x="annot"], body.vid
   <div class="mrow"><span class="ml">« Toutes »</span><div class="seg" id="segSort"><button data-v="page">Par page</button><button data-v="date">Plus récentes</button></div></div>
   <div class="mrow"><label class="switch"><input type="checkbox" id="optTags"> Afficher les étiquettes des notes</label></div>
   <div class="mrow"><label class="switch"><input type="checkbox" id="optHl"> Afficher les surlignages dans la liste</label></div>
+  <div class="mrow"><button class="btn sm" id="abbrBtn">Abréviations…</button></div>
   <hr><h5>Confort</h5>
   <div class="mrow"><span class="ml">Interface</span><div class="seg" id="segUi"><button data-v="0.9">90 %</button><button data-v="1">100 %</button><button data-v="1.1">110 %</button><button data-v="1.25">125 %</button></div></div>
   <div class="mrow"><label class="switch"><input type="checkbox" id="optFontUI"> Utiliser la police des notes partout</label></div>
@@ -1135,6 +1154,7 @@ body.vid #ddExport [data-x="sbs"], body.vid #ddExport [data-x="annot"], body.vid
           <div class="drop" id="drop">
             <button class="btn primary lg" id="openBtn2"><svg class="i" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Ouvrir un nouveau PDF</button>
             <p>ou glisse un fichier ici · <span class="kbd">⌘O</span></p>
+            <button class="btn home-nb" id="nbBtn2"><svg class="i" viewBox="0 0 24 24"><path d="M6 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6z"/><path d="M6 3v18M9.5 8h6M9.5 12h6"/></svg>Carnet sans document</button>
             <button class="btn home-vid" id="vidBtn2"><svg class="i" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="3.5"/><path d="M10 9.2v5.6l4.8-2.8z"/></svg>Prendre des notes sur une vidéo YouTube</button>
             <p class="small">Un PowerPoint s'exporte en PDF via Fichier → Exporter → PDF.</p>
           </div>
@@ -1379,7 +1399,7 @@ const S = {
 };
 function normalizeDoc(d) {
   d.notes = (d.notes || []).map(n => Object.assign({ id: uid(), page: 1, title: '', html: '', tags: [], created: Date.now(), updated: Date.now() }, n));
-  d.highlights = d.highlights || []; d.visited = d.visited || []; d.anchors = d.anchors || []; d.peers = d.peers || {}; d.ink = d.ink || []; d.quiz = d.quiz || []; d.rev = d.rev || {}; d.revLog = d.revLog || []; d.recs = d.recs || []; if (/^yt:/.test(d.fp || '')) { d.kind = 'video'; d.vid = d.fp.slice(3); } return d;
+  d.highlights = d.highlights || []; d.visited = d.visited || []; d.anchors = d.anchors || []; d.peers = d.peers || {}; d.ink = d.ink || []; d.quiz = d.quiz || []; d.rev = d.rev || {}; d.revLog = d.revLog || []; d.recs = d.recs || []; if (/^yt:/.test(d.fp || '')) { d.kind = 'video'; d.vid = d.fp.slice(3); } else if (/^nb:/.test(d.fp || '')) d.kind = 'blank'; return d;
 }
 
 
@@ -1500,8 +1520,9 @@ async function openFile(file, handle) {
 }
 async function activateTab(tab, first) {
   if (tab.video) return Vid.activate(tab, first);
+  if (tab.blank) return Nb.activate(tab, first);
   if (S.fp === tab.fp && S.pages.length) { renderTabs(); return; }
-  if (Vid.doc) Vid.hide();
+  if (Vid.doc) Vid.hide(); if (Nb.doc) Nb.hide();
   if (S.doc) { S.doc.lastPage = S.current; await flushSave(); }
   stopMode(); hideBubble(); document.body.classList.remove('nodoc');
   S.pdf = tab.pdf; S.bytes = tab.bytes; S.fp = tab.fp;
@@ -1517,6 +1538,7 @@ async function activateTab(tab, first) {
   const last = doc.lastPage && doc.lastPage <= tab.pdf.numPages ? doc.lastPage : 1;
   S.current = 0; goTo(last, false); updateCurrent();
   saveSoon(true); renderNotes(); renderTabs();
+  if (Nb.pendingAttach) setTimeout(() => Nb.finishAttach(), 50);
   setTimeout(() => Versions.ensureSigs(doc), 1200);
   if (!prefs.tourDone) setTimeout(() => Tour.start(), 900);
   const n = doc.notes.length;
@@ -1535,7 +1557,7 @@ async function closeTab(tab) {
   setTimeout(() => { try { tab.pdf.destroy(); } catch (e) {} }, 500);
 }
 function showWelcome() {
-  Vid.hide(); stopMode(); S.pdf = null; S.doc = null; S.fp = null; S.bytes = null; S.pages = []; $('pages').innerHTML = ''; $('thumbs').innerHTML = '';
+  Vid.hide(); Nb.hide(); stopMode(); S.pdf = null; S.doc = null; S.fp = null; S.bytes = null; S.pages = []; $('pages').innerHTML = ''; $('thumbs').innerHTML = '';
   $('welcome').classList.remove('hidden'); $('notesPane').classList.add('off');
   $('docTitle').value = ''; $('docTitle').disabled = true; $('pageTotal').textContent = '/ –'; $('pageInput').value = '–';
   renderNotes(); renderRecents(); renderTabs();
@@ -1877,7 +1899,7 @@ function visibleNotes() {
   else if (S.view === 'page') list = list.filter(n => n.page === S.current);
   if (S.filters.size) list = list.filter(n => n.tags.some(t => S.filters.has(t)));
   if (S.view === 'all' && prefs.sort === 'date' && !S.nq) list.sort((a, b) => b.updated - a.updated);
-  else if (S.doc.kind === 'video') list.sort((a, b) => (a.t ?? 1e9) - (b.t ?? 1e9) || a.created - b.created);
+  else if (flatDoc(S.doc)) list.sort((a, b) => (a.t ?? 1e9) - (b.t ?? 1e9) || a.created - b.created);
   else list.sort((a, b) => a.page - b.page || ordKey(a) - ordKey(b));
   return list;
 }
@@ -1912,7 +1934,7 @@ function renderNotes() {
   const notes = visibleNotes();
   const pnotes = visiblePeerNotes();
   updatePeerUI();
-  const grouped = S.doc.kind !== 'video' && ((S.view === 'all' && !(prefs.sort === 'date')) || S.nq);
+  const grouped = !flatDoc(S.doc) && ((S.view === 'all' && !(prefs.sort === 'date')) || S.nq);
   const hlPages = (S.view === 'all' && prefs.hlInList && !S.nq && !S.filters.size) ? new Set(S.doc.highlights.map(h => h.page)) : new Set();
   if (S.view === 'page' && !S.nq && prefs.hlInList && !S.filters.size) S.doc.highlights.filter(h => h.page === S.current).forEach(h => list.appendChild(hlQuote(h)));
   if (!notes.length && pnotes.length && !grouped) {
@@ -1923,6 +1945,7 @@ function renderNotes() {
     const e = document.createElement('div'); e.className = 'empty';
     if (S.nq) e.innerHTML = `<b>Aucune note ne contient « ${esc($('noteSearch').value)} »</b>Essaie un autre mot, ou cherche dans tous tes cours via la Bibliothèque.`;
     else if (S.filters.size) e.innerHTML = '<b>Aucune note avec ce filtre</b>Clique à nouveau sur une étiquette pour la désactiver.';
+    else if (S.doc.kind === 'blank') e.innerHTML = `<b>Carnet vide</b>Écris ta première note en bas (Entrée pour l'ajouter) ou avec le +. Les notes s'affichent dans l'ordre où tu les prends.<div class="tips">• tape <span class="kbd">/</span> dans une note pour insérer un encadré ou un tableau<br>• les abréviations se développent toutes seules (« gvt » → « gouvernement »)</div>`;
     else if (S.doc.kind === 'video') e.innerHTML = `<b>Pas encore de note sur cette vidéo</b>Écris en bas ou dans une note : la vidéo se met en pause et la note garde le moment où tu l'as prise.<div class="tips">• <span class="kbd">⌥T</span> ou « ⏱ Note ici » : une note avec le minutage<br>• <span class="kbd">⌥K</span> lecture / pause, <span class="kbd">⌥J</span> reculer de 5 s<br>• un clic sur un minutage dans une note fait revenir la vidéo à ce moment</div>`;
     else if (S.view === 'page') e.innerHTML = `<b>Pas encore de note sur la page ${S.current}</b>Tape une note rapide en bas (Entrée pour l'ajouter), ou :<div class="tips">• sélectionne un passage du PDF pour le <b>surligner</b> ou le <b>citer</b><br>• <span class="kbd">⌥E</span> pour une note <b>épinglée</b> à un endroit précis<br>• <span class="kbd">⌥A</span> pour <b>associer</b> un titre, un mot ou une image à tes notes<br>• <span class="kbd">⌥C</span> pour <b>capturer</b> un schéma dans une note<br>• <span class="kbd">⌥D</span> pour <b>dessiner</b> ou écrire sur la page<br>• dans une note, tape <span class="kbd">/</span> pour insérer un encadré</div>`;
     else e.innerHTML = '<b>Aucune note pour ce cours</b>Tes notes apparaîtront ici, classées par page.';
@@ -2039,7 +2062,7 @@ function deleteNote(n) {
 function addNote(opt = {}) {
   if (!S.doc) return;
   if (S.nq) clearNoteSearch();
-  S.filters.clear(); S.view = S.doc.kind === 'video' ? 'all' : 'page';
+  S.filters.clear(); S.view = flatDoc(S.doc) ? 'all' : 'page';
   const page = opt.page || S.current;
   const n = { id: uid(), page, title: opt.title || '', html: opt.html || '', tags: [], created: Date.now(), updated: Date.now() };
   if (S.doc.kind === 'video' && Vid.active()) n.t = Math.floor(Vid.time());
@@ -2118,7 +2141,7 @@ quick.addEventListener('keydown', (e) => {
     if (lines.length === 1 && t.length <= 90) title = t;
     else { if (lines[0].length <= 90) { title = lines.shift(); } html = lines.map(l => `<div>${esc(l)}</div>`).join(''); }
     addNote({ title, html, noFocus: true }); quick.value = ''; autosize();
-    toast(S.doc.kind === 'video' ? `Note ajoutée à ${fmtT(Vid.time())}.` : `Note ajoutée à la page ${S.current}.`, { duration: 1600 });
+    toast(S.doc.kind === 'blank' ? 'Note ajoutée.' : S.doc.kind === 'video' ? `Note ajoutée à ${fmtT(Vid.time())}.` : `Note ajoutée à la page ${S.current}.`, { duration: 1600 });
   }
   if (e.key === 'Escape') { quick.blur(); viewer.focus({ preventScroll: true }); }
 });
@@ -3101,6 +3124,7 @@ async function openCourse(fp, page, noteId) {
   const after = () => { if (page) goTo(page, false); if (noteId) setTimeout(() => focusNote(noteId), 150); };
   if (fp === S.fp) { after(); return; }
   if (d.kind === 'video') { await Vid.open(d.vid); after(); return; }
+  if (d.kind === 'blank') { await Nb.open(fp); after(); return; }
   const ot = S.tabs.find(t => t.fp === fp); if (ot) { await activateTab(ot); after(); return; }
   const h = await DB.get('pdf:' + fp);
   if (h && h.getFile) {
@@ -3285,6 +3309,7 @@ function htmlToMd(html, plain) {
 }
 function exportMd(d) {
   if (d.kind === 'video') return Vid.exportMd(d);
+  if (d.kind === 'blank') return Nb.exportMd(d);
   if (!d.notes.length && !d.highlights.length) return toast('Aucune note à exporter pour ce cours.');
   let md = `# ${d.title}\n\n*Notes personnelles · ${today()} · fichier : ${d.name} · ${d.notes.length} notes. Les numéros de page renvoient aux pages du PDF.*\n`;
   const pages = [...new Set([...d.notes.map(n => n.page), ...d.highlights.map(h => h.page)])].sort((a, b) => a - b);
@@ -4317,6 +4342,7 @@ const dataUrlBytes = (u) => { const b = atob(u.split(',')[1] || ''); const a = n
 const ToClaude = {
   async build(d, opt) {
     if (d.kind === 'video') return Vid.claudeMd(d, opt);
+    if (d.kind === 'blank') return Nb.claudeMd(d, opt);
     const since = opt.since || 0; const imgs = []; const list = await Outline.compute().catch(() => []);
     const secTitle = (n) => { const i = Outline.sectionOf(list, n); return i != null ? list[i].title : ''; };
     const secOfPage = (p) => { let k = null; list.forEach((e, i) => { if (e.page <= p) k = i; }); return k != null ? list[k].title : ''; };
@@ -4380,7 +4406,7 @@ const ToClaude = {
       <p class="small" style="margin-top:10px">Ensuite, dans une conversation avec moi : joins ce fichier et la synthèse PDF à compléter, et écris par exemple « Intègre mes notes dans la synthèse ».</p>`;
     const m = openModal('Envoyer à Claude', html, 'sm');
     const opt = () => ({ hl: m.querySelector('#tcHl').checked, images: m.querySelector('#tcImg').checked, peers: !!(m.querySelector('#tcPeers') || {}).checked, trans: !!(m.querySelector('#tcTr') || {}).checked, since: last && m.querySelector('#tcScope .on')?.dataset.v === 'new' ? last : 0 });
-    const upd = async () => { const r = await this.build(d, opt()); const c = r.count; m.querySelector('#tcSum').textContent = d.kind === 'video' ? (c.notes ? `${c.notes} note${c.notes > 1 ? 's' : ''} sur la vidéo, avec leur minutage.` : 'Rien de nouveau à envoyer.') : c.pages || c.trans ? `${c.notes} note${c.notes > 1 ? 's' : ''}, ${c.hls} surlignage${c.hls > 1 ? 's' : ''}${c.peers ? ', ' + c.peers + ' note(s) de collègues' : ''}, ${c.imgs} capture${c.imgs > 1 ? 's' : ''}, sur ${c.pages} page${c.pages > 1 ? 's' : ''}${c.trans ? ' ; ' + c.trans + ' transcription' + (c.trans > 1 ? 's' : '') + ' du cours oral' : ''}.` : 'Rien de nouveau à envoyer.'; m.querySelector('#tcGo').disabled = m.querySelector('#tcCopy').disabled = !(c.pages || c.trans); };
+    const upd = async () => { const r = await this.build(d, opt()); const c = r.count; m.querySelector('#tcSum').textContent = d.kind === 'blank' ? (c.notes || c.trans ? `${c.notes} note${c.notes > 1 ? 's' : ''} du carnet${c.trans ? ' et la transcription du cours oral' : ''}.` : 'Rien de nouveau à envoyer.') : d.kind === 'video' ? (c.notes ? `${c.notes} note${c.notes > 1 ? 's' : ''} sur la vidéo, avec leur minutage.` : 'Rien de nouveau à envoyer.') : c.pages || c.trans ? `${c.notes} note${c.notes > 1 ? 's' : ''}, ${c.hls} surlignage${c.hls > 1 ? 's' : ''}${c.peers ? ', ' + c.peers + ' note(s) de collègues' : ''}, ${c.imgs} capture${c.imgs > 1 ? 's' : ''}, sur ${c.pages} page${c.pages > 1 ? 's' : ''}${c.trans ? ' ; ' + c.trans + ' transcription' + (c.trans > 1 ? 's' : '') + ' du cours oral' : ''}.` : 'Rien de nouveau à envoyer.'; m.querySelector('#tcGo').disabled = m.querySelector('#tcCopy').disabled = !(c.pages || c.trans); };
     m.addEventListener('change', upd); const sc = m.querySelector('#tcScope'); if (sc) sc.addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; sc.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); upd(); });
     upd();
     const done = () => { d.lastClaude = Date.now(); saveSoon(true); Backup.touch(); };
@@ -5195,6 +5221,7 @@ const Vid = {
   async activate(tab, first) {
     if (S.fp === tab.fp && this.doc === S.doc && this.p) { renderTabs(); return; }
     if (S.doc) { S.doc.lastPage = S.current; if (this.active()) S.doc.lastT = this.time(); await flushSave(); }
+    if (Nb.doc) Nb.hide();
     stopMode(); hideBubble(); document.body.classList.remove('nodoc'); document.body.classList.add('vid');
     S.pdf = null; S.bytes = null; S.fp = tab.fp; S.pages = []; $('pages').innerHTML = ''; $('thumbs').innerHTML = '';
     const d = S.docs.get(tab.fp); d.lastOpened = Date.now(); S.doc = d; this.doc = d; S.current = 1;
@@ -5374,6 +5401,182 @@ document.addEventListener('keydown', (e) => {
 document.addEventListener('click', (e) => { const tc = e.target.closest && e.target.closest('#notesList .tc'); if (!tc || !Vid.active()) return; e.preventDefault(); Vid.seek(+tc.dataset.t, true); });
 window.Vid = Vid;
 
+
+/* =================== Carnet vierge : un cours sans document =================== */
+const flatDoc = (d) => !!(d && (d.kind === 'video' || d.kind === 'blank'));
+const Nb = {
+  doc: null, pendingAttach: null,
+  active() { return !!(S.doc && S.doc.kind === 'blank' && this.doc === S.doc); },
+  async create() {
+    const now = new Date();
+    const fp = 'nb:' + uid();
+    const d = normalizeDoc({ fp, name: 'Carnet', title: 'Cours du ' + now.toLocaleDateString('fr-BE', { day: 'numeric', month: 'long' }), notes: [], created: Date.now() });
+    S.docs.set(fp, d); await DB.putDoc(d).catch(() => {});
+    await this.open(fp);
+    setTimeout(() => { const t = $('docTitle'); t.focus(); t.select(); }, 120);
+    toast('Carnet créé : donne-lui un titre, puis écris tes notes à droite.', { duration: 4000 });
+  },
+  async open(fp) {
+    let tab = S.tabs.find(x => x.fp === fp);
+    if (!tab) { tab = { fp, blank: true, name: (S.docs.get(fp) || {}).title || 'Carnet' }; S.tabs.push(tab); }
+    await activateTab(tab, true);
+  },
+  async activate(tab, first) {
+    if (S.fp === tab.fp && this.doc === S.doc) { renderTabs(); return; }
+    if (S.doc) { S.doc.lastPage = S.current; if (Vid.active()) S.doc.lastT = Vid.time(); await flushSave(); }
+    if (Vid.doc) Vid.hide();
+    stopMode(); hideBubble(); document.body.classList.remove('nodoc'); document.body.classList.add('nb');
+    S.pdf = null; S.bytes = null; S.fp = tab.fp; S.pages = []; $('pages').innerHTML = ''; $('thumbs').innerHTML = '';
+    const d = S.docs.get(tab.fp); d.lastOpened = Date.now(); S.doc = d; this.doc = d; S.current = 1;
+    S.search = { q: '', hits: [], idx: -1, texts: {} }; S.shown.clear(); S.filters.clear(); S.nq = ''; $('noteSearch').value = ''; $('noteSearchClr').classList.add('hidden');
+    $('docTitle').value = d.title; $('docTitle').disabled = false;
+    $('welcome').classList.add('hidden'); $('notesPane').classList.remove('off');
+    S.view = 'all'; this.stage(); $('quick').placeholder = 'Note rapide (Entrée)';
+    saveSoon(true); renderNotes(); renderTabs(); setTimeout(fitTopbar, 30);
+    const n = d.notes.length;
+    if (first && n) toast(`${n} note${n > 1 ? 's' : ''} retrouvée${n > 1 ? 's' : ''}.`);
+  },
+  hide() { document.body.classList.remove('nb'); this.doc = null; const st = $('nbStage'); if (st) st.classList.add('hidden'); },
+  stage() {
+    let st = $('nbStage');
+    if (!st) {
+      st = document.createElement('div'); st.id = 'nbStage'; st.className = 'nb-stage';
+      $('viewer').appendChild(st);
+      st.addEventListener('click', (e) => { const a = e.target.closest('[data-nb]')?.dataset.nb; if (a === 'attach') this.attach(); else if (a === 'rec') RecUI.click(e); else if (a === 'abbr') Abbr.settings(); });
+    }
+    st.classList.remove('hidden');
+    const d = this.doc;
+    st.innerHTML = `<div class="nb-card">
+      <div class="nb-ico"><svg class="i" viewBox="0 0 24 24"><path d="M6 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6z"/><path d="M6 3v18M9.5 8h6M9.5 12h6"/></svg></div>
+      <h2>Carnet sans document</h2>
+      <p>Pour un cours sans support, ou quand les slides arrivent après le cours. Tes notes s'écrivent à droite, dans l'ordre où tu les prends.</p>
+      <p class="small">Créé le ${new Date(d.created || Date.now()).toLocaleDateString('fr-BE', { weekday: 'long', day: 'numeric', month: 'long' })}.</p>
+      <div class="nb-acts">
+        <button class="btn" data-nb="rec">${ICON_MIC}Enregistrer le cours</button>
+        <button class="btn" data-nb="attach"><svg class="i" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Rattacher à un PDF…</button>
+      </div>
+      <p class="small nb-tip">Quand tu reçois le PDF du cours, « Rattacher à un PDF » y déplace toutes ces notes (et l'enregistrement s'il y en a un). Astuce : les abréviations (« gvt » → « gouvernement ») se règlent <button class="lnkbtn" data-nb="abbr">ici</button>.</p>
+    </div>`;
+  },
+  attach() {
+    if (!this.active()) return;
+    this.pendingAttach = { fp: S.doc.fp, until: Date.now() + 5 * 60000 };
+    toast('Choisis le PDF du cours : tes notes y seront déplacées.', { duration: 4000 });
+    pickPdf();
+  },
+  // appelé quand un PDF vient de s'ouvrir
+  async finishAttach() {
+    const pa = this.pendingAttach; this.pendingAttach = null;
+    if (!pa || Date.now() > pa.until || !S.doc || S.doc.kind) return;
+    const src = S.docs.get(pa.fp); const dst = S.doc; if (!src || src === dst) return;
+    const n = src.notes.length, r = (src.recs || []).length;
+    src.notes.forEach(x => { x.page = 1; delete x.pin; dst.notes.push(x); });
+    (src.recs || []).forEach(x => { x.pages = [[0, 1]]; dst.recs.push(x); });
+    (src.quiz || []).forEach(q => { q.page = 1; dst.quiz.push(q); });
+    Object.assign(dst.rev, src.rev || {}); (src.revLog || []).forEach(l => dst.revLog.push(l));
+    S.docs.delete(src.fp); await DB.delDoc(src.fp).catch(() => {});
+    const t = S.tabs.find(x => x.fp === src.fp); if (t) S.tabs.splice(S.tabs.indexOf(t), 1);
+    saveSoon(); S.view = 'all'; renderNotes(); updateBadges(); renderTabs(); renderRecents(); Backup.touch();
+    toast(`${n} note${n > 1 ? 's' : ''}${r ? ' et l\'enregistrement' : ''} déplacée${n > 1 ? 's' : ''} sur la page 1. Glisse chaque note (⋮⋮) vers sa page, ou utilise « Rattacher à la page affichée ».`, { duration: 9000 });
+  },
+  sorted(d) { return d.notes.slice().sort((a, b) => a.created - b.created); },
+  exportMd(d) {
+    if (!d.notes.length) return toast('Aucune note à exporter pour ce carnet.');
+    let md = `# ${d.title}\n\n*Notes personnelles · ${today()} · carnet sans document · ${d.notes.length} notes, dans l'ordre où elles ont été prises.*\n`;
+    this.sorted(d).forEach(n => { md += `\n### ${n.title || '(sans titre)'}\n`; if (n.tags.length) md += `*Étiquettes : ${n.tags.map(tagLabel).join(', ')}*\n`; const b = htmlToMd(sanitize(n.html || '')); if (b) md += '\n' + b + '\n'; });
+    downloadBlob(safeName(d.title) + ' - notes.md', md, 'text/markdown;charset=utf-8');
+    toast('Fichier .md téléchargé.', { duration: 3000 });
+  },
+  claudeMd(d, opt) {
+    const since = opt.since || 0; const date = new Date().toLocaleDateString('fr-BE', { day: 'numeric', month: 'long', year: 'numeric' });
+    const notes = this.sorted(d).filter(n => !n.private && (n.updated || n.created || 1) > since && (n.title || htmlText(n.html).trim()));
+    let md = `# Notes à intégrer dans la synthèse — ${d.title}\n\n*Prises avec l'Atelier d'étude (cours sans document), préparé le ${date}. Les notes sont dans l'ordre où je les ai prises pendant le cours.*\n\n## Consignes pour Claude\n\nIntègre ces notes dans la synthèse de ce cours en respectant son code couleur : **noir** pour le contenu du cours, **rouge** pour tes propres ajouts, toujours signalés, **violet italique** pour mes notes personnelles (**[MA NOTE]**), à intégrer sans les reformuler sur le fond. Les **[QUESTION POUR LE PROF]** et **[À VÉRIFIER]** ne sont pas des faits : regroupe-les dans une rubrique « Points à vérifier » à la fin. Ne supprime rien de la synthèse existante sans me le signaler.\n\n## Notes dans l'ordre du cours\n`;
+    notes.forEach(n => {
+      const tags = n.tags.filter(t => t !== 'question' && t !== 'verifier');
+      const kind = n.tags.includes('question') ? 'QUESTION POUR LE PROF' : n.tags.includes('verifier') ? 'À VÉRIFIER' : 'MA NOTE';
+      md += `\n### **[${kind}]**${n.title ? ' ' + n.title.trim() : ''}${tags.length ? ' · *' + tags.map(tagLabel).join(', ') + '*' : ''}\n`;
+      const b = htmlToMd(sanitize(n.html || '')); if (b.trim()) md += '\n' + b.trim().split('\n').map(l => l ? '> ' + l : '>').join('\n') + '\n';
+    });
+    const trs = opt.trans ? (d.recs || []).filter(r => (r.segs || []).length && (r.created || 1) > since) : [];
+    if (trs.length) { md += `\n## Transcription du cours oral\n\n*Reconnaissance vocale automatique : vérifie les noms propres, les dates et les chiffres, et signale en rouge ce dont tu n'es pas sûr.*\n\n`; trs.forEach(r => { md += Trans.text(r, true).replace(/^# /, '### ').replace(/^## Page \d+\n\n/gm, '') + '\n'; }); }
+    return { md, imgs: [], count: { notes: notes.length, hls: 0, peers: 0, pages: notes.length ? 1 : 0, imgs: 0, trans: trs.length } };
+  },
+};
+
+/* =================== Abréviations qui se développent toutes seules =================== */
+const ABBR_DEFAULT = 'gvt = gouvernement\ndvlpt = développement\nens = enseignement\npb = problème\nqqch = quelque chose\nqqn = quelqu\'un\ncàd = c\'est-à-dire\npcq = parce que\nbcp = beaucoup\ntjs = toujours\nsvt = souvent\npdt = pendant\nmvt = mouvement\névt = événement\nappr = apprentissage\nélv = élèves';
+const Abbr = {
+  map: null, last: null,
+  load() {
+    const src = prefs.abbr != null ? prefs.abbr : ABBR_DEFAULT; const m = new Map();
+    src.split('\n').forEach(l => { const i = l.indexOf('='); if (i < 1) return; const k = l.slice(0, i).trim().toLowerCase(), v = l.slice(i + 1).trim(); if (k && v && /^[\p{L}\p{N}'’]+$/u.test(k)) m.set(k, v); });
+    this.map = m; return m;
+  },
+  on() { return prefs.abbrOn !== false; },
+  expand(word) {
+    if (!this.map) this.load();
+    const v = this.map.get(word.toLowerCase()); if (!v) return null;
+    if (word.length > 1 && word === word.toUpperCase() && word !== word.toLowerCase()) return v.toUpperCase();
+    if (word[0] !== word[0].toLowerCase()) return v[0].toUpperCase() + v.slice(1);
+    return v;
+  },
+  TRIG: new Set([' ', 'Enter', ',', ';', ':', '.', '!', '?', ')', 'Tab']),
+  key(e) {
+    if (!this.on() || e.isComposing || e.altKey || e.ctrlKey || e.metaKey) return;
+    const tg = e.target; if (!tg || !$('notesPane').contains(tg) || tg.id === 'noteSearch') return;
+    if (e.key === 'Backspace' && this.last && this.last.el === tg) { if (this.undo(tg)) e.preventDefault(); return; }
+    this.last = null;
+    if (!this.TRIG.has(e.key)) return;
+    if (tg.tagName === 'TEXTAREA' || tg.tagName === 'INPUT') {
+      const p = tg.selectionStart; if (p !== tg.selectionEnd) return;
+      const before = tg.value.slice(0, p); const m = before.match(/(^|[^\p{L}\p{N}'’])([\p{L}\p{N}'’]+)$/u); if (!m) return;
+      const exp = this.expand(m[2]); if (!exp) return;
+      const s = p - m[2].length; tg.value = tg.value.slice(0, s) + exp + tg.value.slice(p); tg.selectionStart = tg.selectionEnd = s + exp.length;
+      this.last = { el: tg, abbr: m[2], exp, trig: e.key === 'Enter' || e.key === 'Tab' ? '' : e.key };
+      tg.dispatchEvent(new Event('input', { bubbles: true }));
+      return;
+    }
+    if (!tg.isContentEditable) return;
+    const sel = getSelection(); if (!sel.rangeCount || !sel.isCollapsed) return;
+    const nd = sel.anchorNode, off = sel.anchorOffset; if (!nd || nd.nodeType !== 3) return;
+    const before = nd.data.slice(0, off); const m = before.match(/(^|[^\p{L}\p{N}'’])([\p{L}\p{N}'’]+)$/u); if (!m) return;
+    const exp = this.expand(m[2]); if (!exp) return;
+    const s = off - m[2].length; nd.data = nd.data.slice(0, s) + exp + nd.data.slice(off);
+    const r = document.createRange(); r.setStart(nd, s + exp.length); r.collapse(true); sel.removeAllRanges(); sel.addRange(r);
+    this.last = { el: tg, node: nd, abbr: m[2], exp, trig: e.key === 'Enter' || e.key === 'Tab' ? '' : e.key };
+    tg.dispatchEvent(new Event('input', { bubbles: true }));
+  },
+  // Retour arrière juste après : on remet l'abréviation telle quelle
+  undo(tg) {
+    const L = this.last; this.last = null; const tail = L.exp + L.trig;
+    if (tg.tagName === 'TEXTAREA' || tg.tagName === 'INPUT') {
+      const p = tg.selectionStart; if (p !== tg.selectionEnd || tg.value.slice(0, p).slice(-tail.length) !== tail) return false;
+      const s = p - tail.length; tg.value = tg.value.slice(0, s) + L.abbr + L.trig + tg.value.slice(p); tg.selectionStart = tg.selectionEnd = s + L.abbr.length + L.trig.length;
+      tg.dispatchEvent(new Event('input', { bubbles: true })); return true;
+    }
+    const sel = getSelection(); if (!sel.rangeCount) return false; const nd = sel.anchorNode, off = sel.anchorOffset;
+    const nb = (x) => x.replace(/\u00a0/g, ' ');
+    if (!nd || nd.nodeType !== 3 || !tg.contains(nd) || nb(nd.data.slice(0, off).slice(-tail.length)) !== nb(tail)) return false;
+    const s = off - tail.length; const rest = nd.data.slice(off); const trig = L.trig === ' ' && !rest ? '\u00a0' : L.trig; // une espace en fin de texte doit être insécable pour rester visible
+    nd.data = nd.data.slice(0, s) + L.abbr + trig + rest;
+    const r = document.createRange(); r.setStart(nd, s + L.abbr.length + trig.length); r.collapse(true); sel.removeAllRanges(); sel.addRange(r);
+    tg.dispatchEvent(new Event('input', { bubbles: true })); return true;
+  },
+  settings() {
+    closeDD();
+    const cur = prefs.abbr != null ? prefs.abbr : ABBR_DEFAULT;
+    const m = openModal('Abréviations', `<p>Tape l'abréviation puis une espace (ou une ponctuation) : elle est remplacée par le mot complet. Un <span class="kbd">⌫</span> juste après annule le remplacement.</p>
+      <div class="mrow" style="margin:8px 0"><label class="switch"><input type="checkbox" id="abOn" ${this.on() ? 'checked' : ''}> Développer les abréviations</label></div>
+      <div class="field"><span class="lbl">Une par ligne : abréviation = mot complet</span><textarea id="abTxt" rows="12" spellcheck="false" style="width:100%;font:13.5px/1.5 ui-monospace,Menlo,Consolas,monospace;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--panel-2);color:var(--ink)">${esc(cur)}</textarea>
+      <p class="small" style="margin:4px 0 0">Les majuscules suivent : « Gvt » donne « Gouvernement », « GVT » donne « GOUVERNEMENT ». Choisis des abréviations qui ne sont pas de vrais mots.</p></div>
+      <div style="display:flex;gap:8px;justify-content:space-between;margin-top:12px"><button class="btn" id="abReset">Remettre la liste de départ</button><button class="btn primary" id="abOk">Enregistrer</button></div>`, 'sm');
+    m.querySelector('#abReset').onclick = () => { m.querySelector('#abTxt').value = ABBR_DEFAULT; };
+    m.querySelector('#abOk').onclick = () => { prefs.abbr = m.querySelector('#abTxt').value; prefs.abbrOn = m.querySelector('#abOn').checked; savePrefs(); this.load(); closeModal(); toast(`${this.map.size} abréviation${this.map.size > 1 ? 's' : ''} enregistrée${this.map.size > 1 ? 's' : ''}.`); };
+  },
+};
+document.addEventListener('keydown', (e) => Abbr.key(e), true);
+window.Nb = Nb; window.Abbr = Abbr;
+
 /* =================== Clavier global =================== */
 document.addEventListener('keydown', (e) => {
   const t = e.target; const editing = t.isContentEditable || /INPUT|TEXTAREA|SELECT/.test(t.tagName);
@@ -5391,6 +5594,7 @@ document.addEventListener('keydown', (e) => {
   if (e.altKey && !cmd && S.doc) {
     const c = e.code;
     if (c === 'KeyN') { e.preventDefault(); addNote(); return; }
+    if (S.doc.kind === 'blank' && ['KeyE', 'KeyC', 'KeyD', 'KeyA', 'KeyL'].includes(c)) { e.preventDefault(); return; }
     if (S.doc.kind === 'video') {
       if (c === 'KeyK') { e.preventDefault(); Vid.toggle(); return; }
       if (c === 'KeyJ') { e.preventDefault(); Vid.skip(-5); return; }
@@ -5453,6 +5657,7 @@ document.addEventListener('keydown', (e) => {
     pb.querySelector('.pb-rate').onclick = () => { const R = [1, 1.25, 1.5, 1.75, 2, 0.75]; Player.rate = R[(R.indexOf(Player.rate) + 1) % R.length]; if (Player.el) Player.el.playbackRate = Player.rate; Player.ui(); };
     pb.querySelector('.pb-track').onclick = (e) => { if (!Player.r) return; const b = e.currentTarget.getBoundingClientRect(); Player.play(Player.d, Player.r, (e.clientX - b.left) / b.width * Player.r.dur); }; }
   RecUI.sync(); TQ.restore();
+  $('nbBtn2').onclick = () => Nb.create(); $('nbItem').onclick = () => { closeDD(); Nb.create(); }; $('abbrBtn').onclick = () => Abbr.settings();
   $('vidBtn2').onclick = () => Vid.ask(); $('vidItem').onclick = () => { closeDD(); Vid.ask(); };
   $('tcBtn').onclick = () => Vid.insertTc();
   document.addEventListener('paste', (e) => { if (isEditingNote() || (document.activeElement && /INPUT|TEXTAREA/.test(document.activeElement.tagName)) || modalEl) return; const t = (e.clipboardData && e.clipboardData.getData('text')) || ''; const r = Vid.parse(t); if (r && /youtu/.test(t)) { e.preventDefault(); Vid.open(r.id, r.t); } });
