@@ -1012,6 +1012,16 @@ body.nb #ddExport [data-x="sbs"], body.nb #ddExport [data-x="annot"], body.nb #d
 .lnkbtn { border: 0; background: none; padding: 0; color: var(--accent); text-decoration: underline; cursor: pointer; font: inherit; }
 .home-nb { margin-top: 6px; }
 
+/* ===== v11 : dictée ===== */
+.notes { position: relative; }
+.dict-btn.dict-on { color: #b3261e; background: rgba(214,69,69,.13); animation: recPulse 1.4s ease-in-out infinite; }
+.dict-btn.dict-busy { opacity: .6; }
+.dict-pill { position: absolute; left: 50%; bottom: 66px; transform: translateX(-50%); z-index: 40; display: flex; align-items: center; gap: 9px; padding: 6px 6px 6px 14px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); box-shadow: var(--shadow-lg); font: 500 13px var(--ui); color: var(--ink); cursor: pointer; white-space: nowrap; max-width: calc(100% - 24px); }
+.dict-pill span:nth-child(2) { overflow: hidden; text-overflow: ellipsis; }
+.dp-dot { width: 11px; height: 11px; border-radius: 50%; background: #d64545; flex: none; box-shadow: 0 0 0 calc(var(--lv, 0) * 9px) rgba(214,69,69,.22); transition: box-shadow .15s; }
+.dp-spin { width: 13px; height: 13px; border-radius: 50%; border: 2px solid var(--line); border-top-color: var(--accent); animation: dpSpin .8s linear infinite; flex: none; }
+@keyframes dpSpin { to { transform: rotate(360deg); } }
+
 /* Mouvement réduit */
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
@@ -1234,6 +1244,7 @@ body.nb #ddExport [data-x="sbs"], body.nb #ddExport [data-x="annot"], body.nb #d
       <div class="dd"><button class="btn" data-dd="ddBlock" title="Insérer un encadré, un tableau, une capture… (ou tape /)"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span class="lbl-ins">Insérer</span> <span class="caret">▾</span></button></div>
       <button class="btn" id="quoteBtn" title="Copier dans la note le passage sélectionné dans le PDF">❝</button>
       <button class="btn vid-only" id="tcBtn" title="Insérer le minutage de la vidéo (⌥T)">⏱</button>
+      <button class="btn dict-btn" id="dictBtn" title="Dicter au lieu de taper (⌥V)"><svg class="i" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button>
       <div class="dd"><button class="btn" data-dd="ddMore" title="Plus : souligné, barré, retrait, effacer la mise en forme">⋯</button></div>
     </div>
     <div class="dd-menu keep" id="ddFilter"><h5>Afficher seulement</h5><div class="filters" id="filters"></div><div class="small" style="padding:0 10px 6px">Clique à nouveau pour retirer un filtre.</div><div id="peersRow" style="padding:4px 10px 8px;border-top:1px solid var(--line)"><label class="switch hidden" id="peersSwitch" title="Afficher les notes de tes collègues"><input type="checkbox" id="showPeers"> Notes des collègues</label></div></div>
@@ -1302,6 +1313,7 @@ body.nb #ddExport [data-x="sbs"], body.nb #ddExport [data-x="annot"], body.nb #d
     </div>
     <div class="notes-foot">
       <textarea class="quick" id="quick" rows="1" placeholder="Note rapide… (Entrée pour l'ajouter)" aria-label="Note rapide"></textarea>
+      <button class="btn dict-btn" id="dictBtn2" title="Dicter au lieu de taper (⌥V)"><svg class="i" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button>
       <button class="btn primary" id="addNote" title="Nouvelle note (⌥N)"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
       <div class="dd"><button class="btn" data-dd="ddTpl" title="Nouvelle note à partir d'un modèle" style="min-width:30px;padding:0 6px">▾</button></div>
       <button class="btn" id="addPinNote" title="Note épinglée à un endroit précis de la page (⌥E)"><svg class="i" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></button>
@@ -2140,6 +2152,7 @@ quick.addEventListener('keydown', (e) => {
     const lines = t.split(/\n+/); let title = '', html = '';
     if (lines.length === 1 && t.length <= 90) title = t;
     else { if (lines[0].length <= 90) { title = lines.shift(); } html = lines.map(l => `<div>${esc(l)}</div>`).join(''); }
+    if (Vid.active() && prefs.vidFlow) { Vid.flowAppend(t); quick.value = ''; autosize(); quick.placeholder = `Note rapide · ${fmtT(Vid.time())} (Entrée)`; return; }
     addNote({ title, html, noFocus: true }); quick.value = ''; autosize();
     toast(S.doc.kind === 'blank' ? 'Note ajoutée.' : S.doc.kind === 'video' ? `Note ajoutée à ${fmtT(Vid.time())}.` : `Note ajoutée à la page ${S.current}.`, { duration: 1600 });
   }
@@ -3800,7 +3813,7 @@ function openHelp() {
     <div>Fiches de révision <span>${k('⌥F')}</span></div>
     <div>Mode lecture plein écran <span>${k('⌥L')}</span></div><div>Modèle de note <span>▾ à côté de +, ou ${k('/')}</span></div>
     <div>Déplacer une note <span>glisser ⋮⋮</span></div><div>Historique des sauvegardes <span>bouton Sauvegarde</span></div>
-    <div>Enregistrer le cours · arrêter <span>${k('⌥M')}</span></div><div>Vidéo : lecture / pause · −5 s <span>${k('⌥K')} ${k('⌥J')}</span></div><div>Vidéo : insérer le minutage <span>${k('⌥T')}</span></div><div>Dessiner sur la page <span>${k('⌥D')}</span></div><div>Annuler le dernier trait <span>${k('⌘Z')}</span></div>
+    <div>Enregistrer le cours · arrêter <span>${k('⌥M')}</span></div><div>Vidéo : lecture / pause · −5 s <span>${k('⌥K')} ${k('⌥J')}</span></div><div>Vidéo : insérer le minutage <span>${k('⌥T')}</span></div><div>Dicter une note <span>${k('⌥V')}</span></div><div>Dessiner sur la page <span>${k('⌥D')}</span></div><div>Annuler le dernier trait <span>${k('⌘Z')}</span></div>
     <div>Changer d'onglet <span>${k('⌥1')} … ${k('⌥9')}</span></div><div>Note rapide <span>tape en bas + ${k('Entrée')}</span></div>
     <div>Quitter la note (retour au PDF) <span>${k('Échap')}</span></div><div>Note suivante / note rapide <span>${k('⌘Entrée')}</span></div>
     <div>Mode « Associer » <span>${k('⌥A')}</span></div><div>Associer en un clic, sans mode <span>${k('⌥')} + clic</span></div>
@@ -5577,6 +5590,143 @@ const Abbr = {
 document.addEventListener('keydown', (e) => Abbr.key(e), true);
 window.Nb = Nb; window.Abbr = Abbr;
 
+
+/* =================== Vidéo : tout dans une note, minutage entre parenthèses =================== */
+Vid.flowNote = function () { const d = this.doc; if (!d) return null; let n = null; d.notes.forEach(x => { if (x.kind !== 'qcm' && (!n || x.created > n.created)) n = x; }); return n; };
+Vid.flowAppend = function (text) {
+  const d = this.doc; if (!d || !String(text || '').trim()) return;
+  const t = Math.floor(this.time());
+  const para = `<div>${esc(String(text).trim()).replace(/\n+/g, '<br>')} (<span class="tc" data-t="${t}" contenteditable="false">${fmtT(t)}</span>)</div>`;
+  let n = this.flowNote();
+  if (!n) { n = addNote({ html: para, noFocus: true }); if (n) n.t = t; }
+  else { n.html = (n.html || '').replace(/(<div><br><\/div>|<br>)+$/i, '') + para; n.updated = Date.now(); if (n.t == null) n.t = t; saveSoon(); renderNotes(); }
+  const c = n && document.querySelector(`.note[data-id="${n.id}"]`); if (c) { c.scrollIntoView({ block: 'nearest' }); c.classList.add('flash'); setTimeout(() => c.classList.remove('flash'), 1000); }
+  toast(`Ajouté à la note${n && n.title ? ' « ' + clip(n.title, 40) + ' »' : ''} (${fmtT(t)}).`, { duration: 1800 });
+  return n;
+};
+{
+  const ins = Vid.insertTc.bind(Vid), here = Vid.noteHere.bind(Vid);
+  Vid.insertTc = function () {
+    const a = document.activeElement;
+    if (prefs.vidFlow && this.active() && a && a.classList && a.classList.contains('body') && $('notesList').contains(a)) {
+      const t = Math.floor(this.time()); const sel = getSelection(); if (!sel.rangeCount || !a.contains(sel.anchorNode)) placeCaretEnd(a);
+      const r = getSelection().getRangeAt(0); r.deleteContents();
+      const span = document.createElement('span'); span.className = 'tc'; span.dataset.t = t; span.contentEditable = 'false'; span.textContent = fmtT(t);
+      const after = document.createTextNode(') '); r.insertNode(after); r.insertNode(span); r.insertNode(document.createTextNode(' ('));
+      r.setStartAfter(after); r.collapse(true); getSelection().removeAllRanges(); getSelection().addRange(r); a.dispatchEvent(new Event('input', { bubbles: true })); return;
+    }
+    return ins();
+  };
+  Vid.noteHere = function () {
+    if (prefs.vidFlow && this.active()) { if (prefs.vidAutoPause !== false) this.pause(true); const q = $('quick'); q.focus(); q.placeholder = `Passage à ${fmtT(this.time())} : écris puis Entrée`; return; }
+    return here();
+  };
+  const st = Vid.stage.bind(Vid);
+  Vid.stage = function () {
+    const had = !!$('vidStage'); const el = st();
+    if (!had) {
+      const o = el.querySelector('.vid-opts');
+      const lab = document.createElement('label'); lab.className = 'switch'; lab.title = 'Au lieu d\'une note par passage, tout s\'écrit à la suite dans la dernière note, avec le minutage entre parenthèses';
+      lab.innerHTML = '<input type="checkbox" id="vidFlow"> Tout dans une note (minutage à la fin)';
+      o.insertBefore(lab, o.querySelector('.vid-keys'));
+      const cb = lab.querySelector('input'); cb.checked = !!prefs.vidFlow;
+      cb.onchange = () => { prefs.vidFlow = cb.checked; savePrefs(); el.querySelector('.vb-tc').innerHTML = cb.checked ? '⏱ Écrire ici' : '⏱ Note ici'; toast(cb.checked ? 'Tes passages s\'ajoutent à la suite dans la dernière note, avec le minutage entre parenthèses. Le + crée une nouvelle note quand tu changes de partie.' : 'Une nouvelle note par passage.', { duration: 5000 }); };
+      el.querySelector('.vb-tc').innerHTML = prefs.vidFlow ? '⏱ Écrire ici' : '⏱ Note ici';
+    }
+    return el;
+  };
+}
+
+/* =================== Dictée : parler au lieu de taper (reconnaissance sur l'ordinateur) =================== */
+const Dict = {
+  on: false, busy: false, stream: null, ctx: null, node: null, buf: [], n: 0, speech: 0, sil: 0, target: null, range: null, timer: null, t0: 0, level: -90, floor: -55,
+  btns() { return [$('dictBtn'), $('dictBtn2')].filter(Boolean); },
+  ui() {
+    this.btns().forEach(b => { b.classList.toggle('dict-on', this.on); b.classList.toggle('dict-busy', this.busy); b.title = this.on ? 'Terminer la dictée (⌥V) · Échap pour annuler' : this.busy ? 'Transcription de la dictée…' : 'Dicter au lieu de taper (⌥V)'; });
+    let p = $('dictPill');
+    if (!this.on && !this.busy) { if (p) p.remove(); return; }
+    if (!p) { p = document.createElement('div'); p.id = 'dictPill'; p.className = 'dict-pill'; $('notesPane').appendChild(p); p.onclick = (e) => { if (e.target.closest('[data-x]')) this.cancel(); else if (this.on) this.stop(); }; }
+    const v = Math.max(0, Math.min(1, (this.level + 60) / 45));
+    p.innerHTML = this.on ? `<span class="dp-dot" style="--lv:${v.toFixed(2)}"></span><span>${this.speech ? 'Je t\'écoute… marque une pause ou clique pour terminer' : 'Parle, je t\'écoute…'}</span><button class="btn ghost sm" data-x title="Annuler (Échap)">✕</button>` : `<span class="dp-spin"></span><span>${Asr.state === 'loading' && Asr.prog && Asr.prog.total ? 'Téléchargement du modèle : ' + Math.round(Asr.prog.loaded / Asr.prog.total * 100) + ' % (une seule fois)' : 'J\'écris ce que tu as dit…'}</span>`;
+  },
+  toggle() { if (this.on) this.stop(); else if (!this.busy && !this.starting) { this.starting = true; this.start().finally(() => { this.starting = false; }); } },
+  async start() {
+    if (!S.doc) return toast('Ouvre d\'abord un cours, une vidéo ou un carnet.');
+    if (!Rec.supported()) return toast('Ce navigateur ne permet pas la dictée. Utilise Chrome ou Edge.');
+    const a = document.activeElement;
+    this.target = a && $('notesPane').contains(a) && (a.isContentEditable || a.tagName === 'TEXTAREA' || (a.tagName === 'INPUT' && a.classList.contains('note-title'))) ? a : null;
+    this.range = null; if (this.target && this.target.isContentEditable) { const s = getSelection(); if (s.rangeCount && this.target.contains(s.anchorNode)) this.range = s.getRangeAt(0).cloneRange(); }
+    if (Vid.active() && Vid.playing()) Vid.pause(true);
+    try { this.stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: false, autoGainControl: true } }); }
+    catch (e) { return openModal('Micro inaccessible', '<p>L\'accès au micro a été refusé ou aucun micro n\'est branché. Clique sur l\'icône à gauche de l\'adresse du site, autorise le <b>micro</b>, puis réessaie.</p>', 'sm'); }
+    await RecUI.defaults(); Asr.ensure(RecUI.model(), prefs.recLang || 'french').catch(() => {});
+    try { this.ctx = new AudioContext({ sampleRate: 16000 }); } catch (e) { this.ctx = new AudioContext(); }
+    await this.ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([REC_WORKLET], { type: 'text/javascript' })));
+    const src = this.ctx.createMediaStreamSource(this.stream); this.node = new AudioWorkletNode(this.ctx, 'atelier-tap', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [1] });
+    const mute = this.ctx.createGain(); mute.gain.value = 0; src.connect(this.node); this.node.connect(mute); mute.connect(this.ctx.destination);
+    this.buf = []; this.n = 0; this.speech = 0; this.sil = 0; this.floor = -55; this.t0 = Date.now(); this.on = true;
+    this.node.port.onmessage = (e) => this.pcm(e.data);
+    if (this.ctx.state === 'suspended') await this.ctx.resume();
+    this.timer = setInterval(() => { this.ui(); if (Date.now() - this.t0 > 90000) this.stop(); }, 200);
+    this.ui();
+  },
+  pcm(f) {
+    if (!this.on) return;
+    this.buf.push(f); this.n += f.length;
+    for (let i = 0; i + 480 <= f.length; i += 480) {
+      let s = 0; for (let k = i; k < i + 480; k++) s += f[k] * f[k];
+      const e = 10 * Math.log10(s / 480 + 1e-10); this.level = e;
+      this.floor = e < this.floor ? this.floor * 0.7 + e * 0.3 : Math.min(this.floor + 0.02, e);
+      if (e > Math.max(this.floor + 10, -50)) { this.speech += 0.03; this.sil = 0; } else this.sil += 0.03;
+    }
+    if (this.speech > 0.5 && this.sil > 1.6) this.stop(); // un silence d'environ 2 secondes après avoir parlé
+  },
+  release() { clearInterval(this.timer); try { this.stream.getTracks().forEach(t => t.stop()); } catch (e) {} try { this.ctx.close(); } catch (e) {} this.stream = this.ctx = this.node = null; this.on = false; },
+  cancel() { if (!this.on) return; this.release(); this.buf = []; this.ui(); toast('Dictée annulée.'); },
+  async stop() {
+    if (!this.on) return;
+    this.release();
+    const pcm = new Float32Array(this.n); let o = 0; this.buf.forEach(b => { pcm.set(b, o); o += b.length; }); this.buf = [];
+    if (this.speech < 0.4) { this.ui(); return toast('Je n\'ai rien entendu. Vérifie le micro et réessaie.'); }
+    this.busy = true; this.ui();
+    const off = Asr.on(() => this.ui());
+    let text = '';
+    try {
+      await Asr.ensure(RecUI.model(), prefs.recLang || 'french');
+      // on garde au plus 28 s de son pour un seul passage ; au-delà on découpe
+      const parts = []; const sg = new AsrSegmenter(s => parts.push(s), { min: 4, max: 26 });
+      for (let k = 0; k < pcm.length; k += 1600) sg.push(pcm.subarray(k, k + 1600)); sg.flush();
+      if (!parts.length) parts.push({ pcm });
+      for (const p of parts) { const r = await Asr.transcribe(p.pcm, prefs.recLang || 'french'); const t = asrClean(r.text); if (t) text += (text ? ' ' : '') + t; }
+    } catch (e) { toast('Dictée impossible : ' + (e.message || e), { duration: 6000 }); }
+    finally { off(); this.busy = false; this.ui(); }
+    if (!text) return toast('Je n\'ai pas compris. Réessaie en parlant un peu plus près du micro.');
+    this.insert(text);
+  },
+  insert(text) {
+    const tg = this.target && document.contains(this.target) ? this.target : null;
+    if (tg && tg.isContentEditable) {
+      tg.focus(); const s = getSelection(); s.removeAllRanges();
+      let r = this.range && tg.contains(this.range.startContainer) ? this.range : null;
+      if (!r) { placeCaretEnd(tg); r = s.getRangeAt(0); } else s.addRange(r);
+      const before = r.startContainer.nodeType === 3 ? r.startContainer.data.slice(0, r.startOffset) : '';
+      const tn = document.createTextNode((before && !/\s$/.test(before) ? ' ' : '') + text + ' ');
+      r.deleteContents(); r.insertNode(tn); r.setStartAfter(tn); r.collapse(true); s.removeAllRanges(); s.addRange(r);
+      tg.dispatchEvent(new Event('input', { bubbles: true }));
+      return;
+    }
+    if (tg && (tg.tagName === 'INPUT' || (tg.tagName === 'TEXTAREA' && tg.id !== 'quick'))) {
+      const p = tg.selectionStart ?? tg.value.length; const pre = tg.value.slice(0, p); const add = (pre && !/\s$/.test(pre) ? ' ' : '') + text;
+      tg.value = pre + add + tg.value.slice(p); tg.selectionStart = tg.selectionEnd = p + add.length; tg.focus(); tg.dispatchEvent(new Event('input', { bubbles: true })); return;
+    }
+    // pas de note ouverte : la dictée devient une note (ou un passage à la suite, pour une vidéo)
+    const q = $('quick'); const cur = q.value.trim(); q.value = (cur ? cur + ' ' : '') + text;
+    q.focus(); q.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
+  },
+};
+document.addEventListener('keydown', (e) => { if (Dict.on && e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); Dict.cancel(); } }, true);
+window.Dict = Dict;
+
 /* =================== Clavier global =================== */
 document.addEventListener('keydown', (e) => {
   const t = e.target; const editing = t.isContentEditable || /INPUT|TEXTAREA|SELECT/.test(t.tagName);
@@ -5594,6 +5744,7 @@ document.addEventListener('keydown', (e) => {
   if (e.altKey && !cmd && S.doc) {
     const c = e.code;
     if (c === 'KeyN') { e.preventDefault(); addNote(); return; }
+    if (c === 'KeyV') { e.preventDefault(); Dict.toggle(); return; }
     if (S.doc.kind === 'blank' && ['KeyE', 'KeyC', 'KeyD', 'KeyA', 'KeyL'].includes(c)) { e.preventDefault(); return; }
     if (S.doc.kind === 'video') {
       if (c === 'KeyK') { e.preventDefault(); Vid.toggle(); return; }
@@ -5660,6 +5811,7 @@ document.addEventListener('keydown', (e) => {
   $('nbBtn2').onclick = () => Nb.create(); $('nbItem').onclick = () => { closeDD(); Nb.create(); }; $('abbrBtn').onclick = () => Abbr.settings();
   $('vidBtn2').onclick = () => Vid.ask(); $('vidItem').onclick = () => { closeDD(); Vid.ask(); };
   $('tcBtn').onclick = () => Vid.insertTc();
+  ['dictBtn', 'dictBtn2'].forEach(id => { $(id).addEventListener('mousedown', e => e.preventDefault()); $(id).onclick = () => Dict.toggle(); });
   document.addEventListener('paste', (e) => { if (isEditingNote() || (document.activeElement && /INPUT|TEXTAREA/.test(document.activeElement.tagName)) || modalEl) return; const t = (e.clipboardData && e.clipboardData.getData('text')) || ''; const r = Vid.parse(t); if (r && /youtu/.test(t)) { e.preventDefault(); Vid.open(r.id, r.t); } });
   // ouverture différée depuis la bibliothèque
   const orig = openFile;
