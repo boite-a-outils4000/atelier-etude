@@ -1022,6 +1022,14 @@ body.nb #ddExport [data-x="sbs"], body.nb #ddExport [data-x="annot"], body.nb #d
 .dp-spin { width: 13px; height: 13px; border-radius: 50%; border: 2px solid var(--line); border-top-color: var(--accent); animation: dpSpin .8s linear infinite; flex: none; }
 @keyframes dpSpin { to { transform: rotate(360deg); } }
 
+/* ===== v12 : grammaire ===== */
+.lt-list { display: flex; flex-direction: column; gap: 10px; max-height: 60vh; overflow: auto; }
+.lt-item { border: 1px solid var(--line); border-radius: 9px; padding: 9px 11px; background: var(--panel); }
+.lt-ctx { font-size: 14px; line-height: 1.45; }
+.lt-ctx mark { background: rgba(214,69,69,.16); color: inherit; border-bottom: 2px solid #d64545; border-radius: 2px; padding: 0 1px; }
+.lt-msg { color: var(--muted); font-size: 12.5px; margin: 4px 0 7px; }
+.lt-sug { display: flex; flex-wrap: wrap; gap: 6px; }
+
 /* Mouvement réduit */
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
@@ -1137,7 +1145,7 @@ body.nb #ddExport [data-x="sbs"], body.nb #ddExport [data-x="annot"], body.nb #d
   <div class="mrow"><span class="ml">« Toutes »</span><div class="seg" id="segSort"><button data-v="page">Par page</button><button data-v="date">Plus récentes</button></div></div>
   <div class="mrow"><label class="switch"><input type="checkbox" id="optTags"> Afficher les étiquettes des notes</label></div>
   <div class="mrow"><label class="switch"><input type="checkbox" id="optHl"> Afficher les surlignages dans la liste</label></div>
-  <div class="mrow"><button class="btn sm" id="abbrBtn">Abréviations…</button></div>
+  <div class="mrow"><button class="btn sm" id="abbrBtn">Abréviations, flèches, orthographe…</button></div>
   <hr><h5>Confort</h5>
   <div class="mrow"><span class="ml">Interface</span><div class="seg" id="segUi"><button data-v="0.9">90 %</button><button data-v="1">100 %</button><button data-v="1.1">110 %</button><button data-v="1.25">125 %</button></div></div>
   <div class="mrow"><label class="switch"><input type="checkbox" id="optFontUI"> Utiliser la police des notes partout</label></div>
@@ -1312,7 +1320,7 @@ body.nb #ddExport [data-x="sbs"], body.nb #ddExport [data-x="annot"], body.nb #d
       <button class="btn ghost icon pb-x" title="Fermer le lecteur">✕</button>
     </div>
     <div class="notes-foot">
-      <textarea class="quick" id="quick" rows="1" placeholder="Note rapide… (Entrée pour l'ajouter)" aria-label="Note rapide"></textarea>
+      <textarea class="quick" id="quick" rows="1" spellcheck="true" lang="fr" placeholder="Note rapide… (Entrée pour l'ajouter)" aria-label="Note rapide"></textarea>
       <button class="btn dict-btn" id="dictBtn2" title="Dicter au lieu de taper (⌥V)"><svg class="i" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button>
       <button class="btn primary" id="addNote" title="Nouvelle note (⌥N)"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
       <div class="dd"><button class="btn" data-dd="ddTpl" title="Nouvelle note à partir d'un modèle" style="min-width:30px;padding:0 6px">▾</button></div>
@@ -2002,7 +2010,7 @@ function noteCard(n) {
     <div class="note-top">
       <span class="grip" draggable="true" title="Glisser pour déplacer la note (vers une autre note, une vignette ou une page du PDF)">⋮⋮</span>
       <button class="btn ghost collapse" title="Replier / déplier">${ICON.chev}</button>
-      <input class="note-title" placeholder="Titre (sert de question en révision)" aria-label="Titre de la note">
+      <input class="note-title" placeholder="Titre (sert de question en révision)" aria-label="Titre de la note" spellcheck="true" lang="fr">
       ${n.private ? '<span class="lock" title="Note privée : jamais partagée">🔒</span>' : ''}
       ${n.moved ? `<button class="moved" title="Transférée depuis l'ancienne version du PDF (page ${n.moved.from}). Vérifie qu'elle est sur la bonne page, puis clique pour confirmer.">⚠︎ à vérifier</button>` : ''}
       ${srsLabel(n)}
@@ -2050,6 +2058,7 @@ function noteMenu(n, anchor) {
     <button data-a="dup">Dupliquer</button>
     <button data-a="merge">Fusionner avec la note suivante</button>
     <button data-a="card">${n.srs ? 'Remettre la fiche à zéro' : 'Ajouter aux fiches'}</button>
+    <button data-a="lt">Vérifier orthographe et grammaire…</button>
     <button data-a="private">${n.private ? '🔓 Rendre partageable' : '🔒 Note privée (jamais partagée)'}</button>
     <hr><button data-a="del" style="color:var(--danger)">Supprimer</button>`;
   closeDD(); m.classList.add('open'); openDD = m;
@@ -2062,6 +2071,7 @@ function noteMenu(n, anchor) {
     else if (a === 'merge') mergeWithNext(n);
     else if (a === 'dup') { const c = JSON.parse(JSON.stringify(n)); c.id = uid(); c.created = c.updated = Date.now(); c.title = (c.title || '') + ' (copie)'; delete c.srs; delete c.pin; S.doc.notes.push(c); saveSoon(); renderNotes(); updateBadges(); }
     else if (a === 'private') { n.private = !n.private; n.updated = Date.now(); saveSoon(); renderNotes(); toast(n.private ? 'Note privée : elle ne sera jamais incluse dans un partage.' : 'Cette note pourra être partagée.'); }
+    else if (a === 'lt') Gram.check(n);
     else if (a === 'card') { n.srs = { box: 1, due: Date.now() }; saveSoon(); renderNotes(); toast('Fiche prête : elle apparaîtra dans « Fiches ».'); }
     else if (a === 'del') deleteNote(n);
   };
@@ -3813,7 +3823,7 @@ function openHelp() {
     <div>Fiches de révision <span>${k('⌥F')}</span></div>
     <div>Mode lecture plein écran <span>${k('⌥L')}</span></div><div>Modèle de note <span>▾ à côté de +, ou ${k('/')}</span></div>
     <div>Déplacer une note <span>glisser ⋮⋮</span></div><div>Historique des sauvegardes <span>bouton Sauvegarde</span></div>
-    <div>Enregistrer le cours · arrêter <span>${k('⌥M')}</span></div><div>Vidéo : lecture / pause · −5 s <span>${k('⌥K')} ${k('⌥J')}</span></div><div>Vidéo : insérer le minutage <span>${k('⌥T')}</span></div><div>Dicter une note <span>${k('⌥V')}</span></div><div>Dessiner sur la page <span>${k('⌥D')}</span></div><div>Annuler le dernier trait <span>${k('⌘Z')}</span></div>
+    <div>Enregistrer le cours · arrêter <span>${k('⌥M')}</span></div><div>Vidéo : lecture / pause · −5 s <span>${k('⌥K')} ${k('⌥J')}</span></div><div>Vidéo : insérer le minutage <span>${k('⌥T')}</span></div><div>Dicter une note <span>${k('⌥V')}</span></div><div>Vérifier orthographe et grammaire <span>${k('⌥G')}</span></div><div>Flèches <span>--&gt; → · =&gt; ⇒ · &lt;-&gt; ↔</span></div><div>Dessiner sur la page <span>${k('⌥D')}</span></div><div>Annuler le dernier trait <span>${k('⌘Z')}</span></div>
     <div>Changer d'onglet <span>${k('⌥1')} … ${k('⌥9')}</span></div><div>Note rapide <span>tape en bas + ${k('Entrée')}</span></div>
     <div>Quitter la note (retour au PDF) <span>${k('Échap')}</span></div><div>Note suivante / note rapide <span>${k('⌘Entrée')}</span></div>
     <div>Mode « Associer » <span>${k('⌥A')}</span></div><div>Associer en un clic, sans mode <span>${k('⌥')} + clic</span></div>
@@ -5578,13 +5588,18 @@ const Abbr = {
   settings() {
     closeDD();
     const cur = prefs.abbr != null ? prefs.abbr : ABBR_DEFAULT;
-    const m = openModal('Abréviations', `<p>Tape l'abréviation puis une espace (ou une ponctuation) : elle est remplacée par le mot complet. Un <span class="kbd">⌫</span> juste après annule le remplacement.</p>
+    const m = openModal('Saisie automatique', `<h4 style="margin:0 0 6px">Abréviations</h4><p>Tape l'abréviation puis une espace (ou une ponctuation) : elle est remplacée par le mot complet. Un <span class="kbd">⌫</span> juste après annule le remplacement.</p>
       <div class="mrow" style="margin:8px 0"><label class="switch"><input type="checkbox" id="abOn" ${this.on() ? 'checked' : ''}> Développer les abréviations</label></div>
       <div class="field"><span class="lbl">Une par ligne : abréviation = mot complet</span><textarea id="abTxt" rows="12" spellcheck="false" style="width:100%;font:13.5px/1.5 ui-monospace,Menlo,Consolas,monospace;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--panel-2);color:var(--ink)">${esc(cur)}</textarea>
       <p class="small" style="margin:4px 0 0">Les majuscules suivent : « Gvt » donne « Gouvernement », « GVT » donne « GOUVERNEMENT ». Choisis des abréviations qui ne sont pas de vrais mots.</p></div>
+      <h4 style="margin:14px 0 6px">Flèches</h4>
+      <div class="mrow"><label class="switch"><input type="checkbox" id="arOn" ${prefs.arrowsOn !== false ? 'checked' : ''}> Flèches automatiques</label></div>
+      <p class="small" style="margin:4px 0 0">--> ou -> donne →, <-- donne ←, <-> donne ↔, => donne ⇒, <=> donne ⇔. Un ⌫ juste après remet les signes tapés.</p>
+      <h4 style="margin:14px 0 6px">Orthographe</h4>
+      <p class="small" style="margin:0">Les fautes de frappe sont soulignées en rouge par Chrome : clic droit sur le mot pour voir les corrections. Si rien n'est souligné, vérifie dans Chrome : Paramètres → Langues → Correcteur orthographique, avec le français activé. Pour les accords et la grammaire : ⋯ d'une note → « Vérifier orthographe et grammaire » (⌥G).</p>
       <div style="display:flex;gap:8px;justify-content:space-between;margin-top:12px"><button class="btn" id="abReset">Remettre la liste de départ</button><button class="btn primary" id="abOk">Enregistrer</button></div>`, 'sm');
     m.querySelector('#abReset').onclick = () => { m.querySelector('#abTxt').value = ABBR_DEFAULT; };
-    m.querySelector('#abOk').onclick = () => { prefs.abbr = m.querySelector('#abTxt').value; prefs.abbrOn = m.querySelector('#abOn').checked; savePrefs(); this.load(); closeModal(); toast(`${this.map.size} abréviation${this.map.size > 1 ? 's' : ''} enregistrée${this.map.size > 1 ? 's' : ''}.`); };
+    m.querySelector('#abOk').onclick = () => { prefs.abbr = m.querySelector('#abTxt').value; prefs.abbrOn = m.querySelector('#abOn').checked; prefs.arrowsOn = m.querySelector('#arOn').checked; savePrefs(); this.load(); closeModal(); toast(`${this.map.size} abréviation${this.map.size > 1 ? 's' : ''} enregistrée${this.map.size > 1 ? 's' : ''}.`); };
   },
 };
 document.addEventListener('keydown', (e) => Abbr.key(e), true);
@@ -5727,6 +5742,125 @@ const Dict = {
 document.addEventListener('keydown', (e) => { if (Dict.on && e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); Dict.cancel(); } }, true);
 window.Dict = Dict;
 
+
+/* =================== Flèches automatiques : --> devient → =================== */
+const Arrows = {
+  RULES: [['<=>', '⇔'], ['<->', '↔'], ['-->', '→'], ['==>', '⇒'], ['<--', '←'], ['<==', '⇐'], ['->', '→'], ['=>', '⇒']],
+  last: null,
+  on() { return prefs.arrowsOn !== false; },
+  input(e) {
+    if (!this.on() || e.inputType !== 'insertText' || !/^[>=-]$/.test(e.data || '')) { if (e.inputType !== 'deleteContentBackward') this.last = null; return; }
+    const tg = e.target; if (!tg || !$('notesPane').contains(tg) || tg.id === 'noteSearch') return;
+    const hit = (before) => this.RULES.find(([k]) => before.endsWith(k));
+    if (tg.tagName === 'TEXTAREA' || tg.tagName === 'INPUT') {
+      const p = tg.selectionStart; if (p !== tg.selectionEnd) return;
+      const r = hit(tg.value.slice(0, p)); if (!r) return;
+      const s = p - r[0].length; tg.value = tg.value.slice(0, s) + r[1] + tg.value.slice(p); tg.selectionStart = tg.selectionEnd = s + 1;
+      this.last = { el: tg, from: r[0], to: r[1] }; return;
+    }
+    if (!tg.isContentEditable) return;
+    const sel = getSelection(); if (!sel.rangeCount || !sel.isCollapsed) return;
+    const nd = sel.anchorNode, off = sel.anchorOffset; if (!nd || nd.nodeType !== 3) return;
+    const r = hit(nd.data.slice(0, off)); if (!r) return;
+    const s = off - r[0].length; nd.data = nd.data.slice(0, s) + r[1] + nd.data.slice(off);
+    const rg = document.createRange(); rg.setStart(nd, s + 1); rg.collapse(true); sel.removeAllRanges(); sel.addRange(rg);
+    this.last = { el: tg, node: nd, from: r[0], to: r[1] };
+    tg.dispatchEvent(new Event('input', { bubbles: true }));
+  },
+  // ⌫ juste après : on remet les caractères tapés
+  key(e) {
+    if (e.key !== 'Backspace' || !this.last || e.target !== this.last.el) { if (e.key !== 'Backspace' && e.key.length === 1) this.last = null; return; }
+    const L = this.last; this.last = null; const tg = e.target;
+    if (tg.tagName === 'TEXTAREA' || tg.tagName === 'INPUT') {
+      const p = tg.selectionStart; if (p !== tg.selectionEnd || tg.value[p - 1] !== L.to) return;
+      e.preventDefault(); tg.value = tg.value.slice(0, p - 1) + L.from + tg.value.slice(p); tg.selectionStart = tg.selectionEnd = p - 1 + L.from.length; tg.dispatchEvent(new Event('input', { bubbles: true })); return;
+    }
+    const sel = getSelection(); const nd = sel.anchorNode, off = sel.anchorOffset;
+    if (!nd || nd.nodeType !== 3 || nd.data[off - 1] !== L.to) return;
+    e.preventDefault(); nd.data = nd.data.slice(0, off - 1) + L.from + nd.data.slice(off);
+    const rg = document.createRange(); rg.setStart(nd, off - 1 + L.from.length); rg.collapse(true); sel.removeAllRanges(); sel.addRange(rg);
+    tg.dispatchEvent(new Event('input', { bubbles: true }));
+  },
+};
+document.addEventListener('input', (e) => Arrows.input(e), true);
+document.addEventListener('keydown', (e) => Arrows.key(e), true);
+
+/* =================== Orthographe et grammaire (LanguageTool, à la demande) =================== */
+const Gram = {
+  API: 'https://api.languagetool.org/v2/check',
+  // texte de la note, avec la position de chaque morceau dans la note
+  collect(card) {
+    const segs = []; let text = '';
+    const title = card.querySelector('.note-title');
+    if (title && title.value.trim()) { segs.push({ kind: 'title', el: title, start: 0, end: title.value.length }); text = title.value + '\n\n'; }
+    const body = card.querySelector('.body');
+    const blockOf = (n) => { let x = n.parentElement; while (x && x !== body && !/^(DIV|P|LI|H2|H3|H4|BLOCKQUOTE|TD|FIGCAPTION)$/.test(x.tagName)) x = x.parentElement; return x; };
+    const w = document.createTreeWalker(body, NodeFilter.SHOW_TEXT, { acceptNode: (n) => n.parentElement.closest('.tc,.lnk-cap,figure') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT });
+    let lastBlock = null, nd;
+    while ((nd = w.nextNode())) {
+      const b = blockOf(nd); if (lastBlock && b !== lastBlock && !/\n$/.test(text)) text += '\n'; lastBlock = b;
+      segs.push({ kind: 'text', node: nd, start: text.length, end: text.length + nd.data.length }); text += nd.data;
+    }
+    return { text, segs, body };
+  },
+  async check(n) {
+    const card = document.querySelector(`.note[data-id="${n.id}"]`); if (!card) return;
+    if (!prefs.ltOk) {
+      const m = openModal('Vérifier l\'orthographe et la grammaire', `<p>Pour vérifier les accords, la conjugaison et la ponctuation, le texte de cette note est envoyé à <b>LanguageTool</b>, un service européen gratuit, puis les corrections s'affichent ici. Il n'est envoyé qu'au moment où tu le demandes, et seulement cette note.</p>
+        <p class="small">Le soulignement rouge des fautes de frappe, lui, est fait par Chrome sans rien envoyer.</p>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button class="btn" data-close2>Annuler</button><button class="btn primary" id="ltOk">D'accord, vérifier</button></div>`, 'sm');
+      m.querySelector('[data-close2]').onclick = closeModal;
+      m.querySelector('#ltOk').onclick = () => { prefs.ltOk = true; savePrefs(); closeModal(); this.check(n); };
+      return;
+    }
+    const c = this.collect(card);
+    if (!c.text.trim()) return toast('Cette note est vide.');
+    if (c.text.length > 19000) return toast('Note trop longue pour être vérifiée d\'un coup.');
+    toast('Vérification en cours…', { duration: 8000 });
+    let res;
+    try {
+      const body = new URLSearchParams({ text: c.text, language: 'fr', motherTongue: 'fr', level: 'default' });
+      const r = await fetch(this.API, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
+      if (r.status === 429) throw new Error('trop de vérifications d\'affilée, attends une minute');
+      if (!r.ok) throw new Error('service indisponible (' + r.status + ')');
+      res = await r.json();
+    } catch (e) { return toast('Vérification impossible : ' + (/fetch|network/i.test(e.message) ? 'pas de connexion internet' : e.message) + '.', { duration: 6000 }); }
+    const items = (res.matches || []).filter(x => x.length > 0).map(x => ({ off: x.offset, len: x.length, msg: x.message || x.shortMessage || '', sug: (x.replacements || []).slice(0, 4).map(r => r.value), ctx: x.context, cat: (x.rule && x.rule.category && x.rule.category.name) || '' }));
+    $('toast').classList.remove('on');
+    this.show(n, card, c, items);
+  },
+  show(n, card, c, items) {
+    if (!items.length) return toast('Aucune faute trouvée dans cette note.', { duration: 3000 });
+    const html = items.map((it, i) => { const a = Math.max(0, it.off - 40), b = Math.min(c.text.length, it.off + it.len + 40);
+      return `<div class="lt-item" data-i="${i}"><div class="lt-ctx">${a > 0 ? '…' : ''}${esc(c.text.slice(a, it.off)).replace(/\n/g, ' ')}<mark>${esc(c.text.slice(it.off, it.off + it.len))}</mark>${esc(c.text.slice(it.off + it.len, b)).replace(/\n/g, ' ')}${b < c.text.length ? '…' : ''}</div>
+        <div class="lt-msg">${esc(it.msg)}</div>
+        <div class="lt-sug">${it.sug.map((s, k) => `<button class="btn sm primary" data-s="${k}">${esc(s) || '(supprimer)'}</button>`).join('')}<button class="btn sm ghost" data-ign>Ignorer</button></div></div>`; }).join('');
+    const m = openModal(`${items.length} correction${items.length > 1 ? 's' : ''} proposée${items.length > 1 ? 's' : ''}`, `<div class="lt-list">${html}</div><p class="small" style="margin-top:10px">Corrections proposées par LanguageTool. Vérifie avant d'accepter : les noms propres et le vocabulaire spécialisé sont parfois signalés à tort.</p><div style="display:flex;justify-content:flex-end;margin-top:8px"><button class="btn primary" data-close2>Terminé</button></div>`, 'sm');
+    m.querySelector('[data-close2]').onclick = closeModal;
+    m.querySelector('.lt-list').onclick = (e) => {
+      const row = e.target.closest('.lt-item'); if (!row) return; const it = items[+row.dataset.i];
+      if (e.target.closest('[data-s]')) { const rep = it.sug[+e.target.closest('[data-s]').dataset.s]; const delta = this.apply(n, card, c, it.off, it.len, rep); items.forEach(x => { if (x !== it && x.off > it.off) x.off += delta; }); }
+      if (e.target.closest('[data-s],[data-ign]')) { row.remove(); if (!m.querySelector('.lt-item')) { closeModal(); toast('Note vérifiée.'); } }
+    };
+  },
+  apply(n, card, c, off, len, rep) {
+    const end = off + len; let first = true; let delta = rep.length - len;
+    for (const sg of c.segs) {
+      if (sg.end <= off || sg.start >= end) continue;
+      const a = Math.max(off, sg.start) - sg.start, b = Math.min(end, sg.end) - sg.start;
+      const cur = sg.kind === 'title' ? sg.el.value : sg.node.data;
+      const nv = cur.slice(0, a) + (first ? rep : '') + cur.slice(b); first = false;
+      if (sg.kind === 'title') { sg.el.value = nv; sg.el.dispatchEvent(new Event('input', { bubbles: true })); } else sg.node.data = nv;
+    }
+    // décaler les morceaux suivants
+    c.segs.forEach(sg => { if (sg.start >= end) { sg.start += delta; sg.end += delta; } else if (sg.end >= end) sg.end += delta; });
+    c.text = c.text.slice(0, off) + rep + c.text.slice(end);
+    c.body.dispatchEvent(new Event('input', { bubbles: true }));
+    return delta;
+  },
+};
+window.Arrows = Arrows; window.Gram = Gram;
+
 /* =================== Clavier global =================== */
 document.addEventListener('keydown', (e) => {
   const t = e.target; const editing = t.isContentEditable || /INPUT|TEXTAREA|SELECT/.test(t.tagName);
@@ -5745,6 +5879,7 @@ document.addEventListener('keydown', (e) => {
     const c = e.code;
     if (c === 'KeyN') { e.preventDefault(); addNote(); return; }
     if (c === 'KeyV') { e.preventDefault(); Dict.toggle(); return; }
+    if (c === 'KeyG') { e.preventDefault(); const card = document.activeElement && document.activeElement.closest && document.activeElement.closest('.note:not(.peer)'); const n = card && S.doc.notes.find(x => x.id === card.dataset.id); if (n) Gram.check(n); else toast('Place-toi dans une note pour la vérifier.'); return; }
     if (S.doc.kind === 'blank' && ['KeyE', 'KeyC', 'KeyD', 'KeyA', 'KeyL'].includes(c)) { e.preventDefault(); return; }
     if (S.doc.kind === 'video') {
       if (c === 'KeyK') { e.preventDefault(); Vid.toggle(); return; }
