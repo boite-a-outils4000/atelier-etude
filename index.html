@@ -1047,6 +1047,9 @@ body.nb #ddExport [data-x="sbs"], body.nb #ddExport [data-x="annot"], body.nb #d
 .lt-msg { color: var(--muted); font-size: 12.5px; margin: 4px 0 7px; }
 .lt-sug { display: flex; flex-wrap: wrap; gap: 6px; }
 
+/* ===== v13 : texte justifié ===== */
+body.justify .notes-list .body, body.justify #print .body, body.justify .fc-card .body { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+body.justify .notes-list .body h2, body.justify .notes-list .body h3, body.justify #print .body h2, body.justify #print .body h3 { text-align: left; hyphens: manual; }
 /* Mouvement réduit */
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
@@ -1156,6 +1159,7 @@ body.nb #ddExport [data-x="sbs"], body.nb #ddExport [data-x="annot"], body.nb #d
   <div class="mrow"><div class="seg" id="segSide"><button data-v="left">PDF à gauche</button><button data-v="right">PDF à droite</button></div></div>
   <hr><h5>Notes</h5>
   <div class="mrow"><span class="ml">Taille</span><div class="seg" id="segSize"><button data-v="13.5">Petite</button><button data-v="15">Normale</button><button data-v="16.5">Grande</button><button data-v="18.5">Très grande</button></div></div>
+  <div class="mrow"><span class="ml">Alignement</span><div class="seg" id="segAlign"><button data-v="left">À gauche</button><button data-v="justify">Justifié</button></div></div>
   <div class="mrow"><span class="ml">Interligne</span><div class="seg" id="segLh"><button data-v="1.35">Serré</button><button data-v="1.5">Normal</button><button data-v="1.75">Aéré</button></div></div>
   <div class="mrow wrap"><span class="ml">Police</span><div class="seg" id="segFont"><button data-v="sys">Système</button><button data-v="sans">Source Sans</button><button data-v="round">Nunito</button><button data-v="serif">Empattements</button><button data-v="read">Très lisible</button><button data-v="dys">Dyslexie</button></div></div>
   <div class="mrow"><span class="ml">Présentation</span><div class="seg" id="segStyle"><button data-v="cards">Cartes</button><button data-v="notebook">Cahier</button></div></div>
@@ -1446,7 +1450,7 @@ function toast(msg, opt = {}) {
 /* =================== Préférences =================== */
 const lsGet = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } };
 const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } };
-const prefs = Object.assign({ theme: 'auto', left: 60, side: 'left', focus: 'none', size: 15, lh: 1.5, font: 'sans', style: 'cards', sort: 'page', tags: true, hlInList: true, me: '', meId: '', showPeers: true, thumbs: false, refLayout: 'side', refSize: 46, pen: '#2b5d8a', penTool: 'pen', penSize: 3, ui: 1, fontUI: false, hc: false, tourDone: false, accent: 'teal', revMask: true, sessSize: 20, autoQcm: true, sessOpen: true }, lsGet('etude.prefs', {}));
+const prefs = Object.assign({ theme: 'auto', left: 60, side: 'left', focus: 'none', size: 15, lh: 1.5, font: 'sans', style: 'cards', sort: 'page', tags: true, hlInList: true, me: '', meId: '', showPeers: true, thumbs: false, refLayout: 'side', refSize: 46, pen: '#2b5d8a', penTool: 'pen', penSize: 3, ui: 1, fontUI: false, hc: false, tourDone: false, accent: 'teal', revMask: true, sessSize: 20, autoQcm: true, sessOpen: true, align: 'left' }, lsGet('etude.prefs', {}));
 if ('look' in prefs) { if (prefs.look !== 'apple') prefs.accent = 'teal'; delete prefs.look; delete prefs.uni; delete prefs.titles; }
 if (!prefs.meId) { prefs.meId = 'u' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8); lsSet('etude.prefs', prefs); }
 const savePrefs = () => lsSet('etude.prefs', prefs);
@@ -1512,12 +1516,13 @@ function applyPrefs() {
   r.setProperty('--ui-zoom', prefs.ui || 1); document.body.classList.toggle('ui-font', !!prefs.fontUI); document.documentElement.classList.toggle('hc', !!prefs.hc); const de = document.documentElement; [...de.classList].filter(c => c.startsWith('ac-')).forEach(c => de.classList.remove(c)); if (prefs.accent && prefs.accent !== 'teal') de.classList.add('ac-' + prefs.accent); { const mt = document.querySelector('meta[name=theme-color]'); if (mt) mt.content = getComputedStyle(de).getPropertyValue('--panel').trim(); }
   $('optFontUI').checked = !!prefs.fontUI; $('optHc').checked = !!prefs.hc;
   $('notesList').classList.toggle('notebook', prefs.style === 'notebook');
+  document.body.classList.toggle('justify', prefs.align === 'justify');
   $('notesList').classList.toggle('hide-tags', !prefs.tags);
-  const segs = { segTheme: prefs.theme || 'auto', segAccent: prefs.accent, segUi: String(prefs.ui || 1), segFocus: prefs.focus, segSide: prefs.side, segSize: String(prefs.size), segLh: String(prefs.lh), segFont: prefs.font, segStyle: prefs.style, segSort: prefs.sort };
+  const segs = { segTheme: prefs.theme || 'auto', segAccent: prefs.accent, segUi: String(prefs.ui || 1), segFocus: prefs.focus, segSide: prefs.side, segSize: String(prefs.size), segLh: String(prefs.lh), segFont: prefs.font, segStyle: prefs.style, segSort: prefs.sort, segAlign: prefs.align || 'left' };
   Object.entries(segs).forEach(([id, v]) => $(id).querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.v === v)));
   $('optTags').checked = !!prefs.tags; $('optHl').checked = !!prefs.hlInList;
 }
-const segMap = { segTheme: ['theme', String], segAccent: ['accent', String], segUi: ['ui', Number], segFocus: ['focus', String], segSide: ['side', String], segSize: ['size', Number], segLh: ['lh', Number], segFont: ['font', String], segStyle: ['style', String], segSort: ['sort', String] };
+const segMap = { segTheme: ['theme', String], segAccent: ['accent', String], segUi: ['ui', Number], segFocus: ['focus', String], segSide: ['side', String], segSize: ['size', Number], segLh: ['lh', Number], segFont: ['font', String], segStyle: ['style', String], segSort: ['sort', String], segAlign: ['align', String] };
 Object.entries(segMap).forEach(([id, [key, cast]]) => $(id).addEventListener('click', (e) => {
   const b = e.target.closest('button'); if (!b) return; prefs[key] = cast(b.dataset.v); savePrefs(); applyPrefs();
   if (key === 'focus' || key === 'side' || key === 'ui') setTimeout(() => layout(true), 30);
