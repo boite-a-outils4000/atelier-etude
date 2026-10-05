@@ -1039,6 +1039,8 @@ body.justify .notes-list .body h2, body.justify .notes-list .body h3, body.justi
 #print .pmeta { font: 700 9pt "Nunito", sans-serif; color: #6b45b8; margin: 0 0 1pt; }
 #print .pmeta a, #print a.tc { color: #6b45b8; text-decoration: none; }
 #print .trp { font-size: 10pt; line-height: 1.45; margin: 0 0 6pt; }
+/* ===== v15 : menus et taille de l'interface ===== */
+.notes .dd-menu { zoom: 1; }
 /* Mouvement réduit */
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
@@ -1469,6 +1471,16 @@ function cycleFocus() { prefs.focus = prefs.focus === 'none' ? 'pdf' : prefs.foc
 
 /* =================== Menus déroulants =================== */
 let openDD = null;
+// Position d'un menu en tenant compte de la taille de l'interface (90 %, 110 %, 125 %)
+function ddZoom(el) { let z = 1; for (let x = el; x && x.nodeType === 1; x = x.parentElement) { const v = parseFloat(getComputedStyle(x).zoom); if (v && isFinite(v)) z *= v; } return z; }
+function placeDD(m, r, align) {
+  m.style.maxHeight = ''; m.style.overflowY = '';
+  const z = ddZoom(m); const w = m.offsetWidth * z; let h = m.offsetHeight * z;
+  let x = align === 'right' ? r.right - w : r.left; if (x + w > innerWidth - 8) x = r.right - w; x = Math.max(8, Math.min(innerWidth - w - 8, x));
+  let y = r.bottom + 4; if (y + h > innerHeight - 8) y = r.top - h - 4;
+  if (y < 8) { y = Math.max(8, Math.min(r.bottom + 4, innerHeight - 160)); m.style.maxHeight = Math.max(150, (innerHeight - y - 8) / z) + 'px'; m.style.overflowY = 'auto'; }
+  m.style.left = (x / z) + 'px'; m.style.top = (y / z) + 'px';
+}
 function closeDD() { if (openDD) { openDD.classList.remove('open'); openDD = null; } }
 document.addEventListener('click', (e) => {
   const trg = e.target.closest('[data-dd]');
@@ -1476,10 +1488,7 @@ document.addEventListener('click', (e) => {
     const m = $(trg.dataset.dd); const was = openDD === m; closeDD();
     if (!was) {
       m.classList.add('open'); openDD = m;
-      const r = trg.getBoundingClientRect(); const w = m.offsetWidth, h = m.offsetHeight;
-      let x = r.left; if (x + w > innerWidth - 8) x = Math.max(8, r.right - w);
-      let y = r.bottom + 4; if (y + h > innerHeight - 8) y = Math.max(8, r.top - h - 4);
-      m.style.left = x + 'px'; m.style.top = y + 'px';
+      placeDD(m, trg.getBoundingClientRect());
     }
     e.stopPropagation(); return;
   }
@@ -2074,7 +2083,7 @@ function noteMenu(n, anchor) {
     <button data-a="private">${n.private ? '🔓 Rendre partageable' : '🔒 Note privée (jamais partagée)'}</button>
     <hr><button data-a="del" style="color:var(--danger)">Supprimer</button>`;
   closeDD(); m.classList.add('open'); openDD = m;
-  const r = anchor.getBoundingClientRect(); m.style.left = Math.max(8, Math.min(innerWidth - m.offsetWidth - 8, r.right - m.offsetWidth)) + 'px'; m.style.top = (r.bottom + 4) + 'px';
+  placeDD(m, anchor.getBoundingClientRect(), 'right');
   m.onclick = (e) => {
     const a = e.target.closest('[data-a]')?.dataset.a; if (!a) return; closeDD();
     if (a === 'pin') { if (n.page !== S.current) goTo(n.page); startMode('pin', n); }
@@ -2386,6 +2395,7 @@ function runCmd(cmd, body) {
 function insertBlock(kind, body) {
   body = body || activeBody();
   if (kind === 'capture') { startMode('capture'); return; }
+  if (!body && S.doc) { const n = addNote({}); body = n && document.querySelector(`.note[data-id="${n.id}"] .body`); if (body) placeCaretEnd(body); }
   if (!body) { toast('Clique d\'abord dans une note.'); return; }
   const s = getSelection(); let inner = '<br>';
   if (s.rangeCount && !s.isCollapsed) { const d = document.createElement('div'); d.appendChild(s.getRangeAt(0).cloneContents()); inner = d.innerHTML || '<br>'; }
@@ -3140,7 +3150,7 @@ async function openLibrary() {
       e.stopPropagation();
       let mm = $('ddLib'); if (!mm) { mm = document.createElement('div'); mm.className = 'dd-menu'; mm.id = 'ddLib'; document.body.appendChild(mm); }
       mm.innerHTML = `${S.doc && S.doc.fp !== d.fp ? `<button data-l="transfer">Transférer ses notes vers « ${esc(S.doc.title).slice(0, 40)} »…<span class="d">Si c'est une nouvelle version de ce cours</span></button><hr>` : ''}<button data-l="md">Exporter les notes (.md)</button><button data-l="json">Sauvegarde de ce cours (.json)</button><hr><button data-l="del" style="color:var(--danger)">Supprimer les notes de ce cours…</button>`;
-      closeDD(); mm.classList.add('open'); openDD = mm; const r = e.target.closest('button').getBoundingClientRect(); mm.style.left = (r.right - mm.offsetWidth) + 'px'; mm.style.top = (r.bottom + 4) + 'px';
+      closeDD(); mm.classList.add('open'); openDD = mm; placeDD(mm, e.target.closest('button').getBoundingClientRect(), 'right');
       mm.onclick = async (ev) => {
         const l = ev.target.closest('[data-l]')?.dataset.l; if (!l) return; closeDD();
         if (l === 'md') exportMd(d);
@@ -5057,7 +5067,7 @@ const RecUI = {
     };
     if (!open) return;
     closeDD(); m.classList.add('open'); openDD = m;
-    const rb = $('recBtn').getBoundingClientRect(); m.style.left = Math.max(8, Math.min(innerWidth - m.offsetWidth - 8, rb.left)) + 'px'; m.style.top = (rb.bottom + 4) + 'px';
+    placeDD(m, $('recBtn').getBoundingClientRect());
   },
   async settings(first) {
     await this.defaults();
@@ -5178,7 +5188,7 @@ const Trans = {
       <button data-t="rename">Renommer</button>
       <hr><button data-t="del" style="color:var(--danger)">Supprimer l'enregistrement…</button>`;
     closeDD(); m.classList.add('open'); openDD = m;
-    const b = anchor.getBoundingClientRect(); m.style.left = Math.max(8, Math.min(innerWidth - m.offsetWidth - 8, b.right - m.offsetWidth)) + 'px'; m.style.top = (b.bottom + 4) + 'px';
+    placeDD(m, anchor.getBoundingClientRect(), 'right');
     m.onclick = async (e) => {
       const a = e.target.closest('[data-t]')?.dataset.t; if (!a) return; closeDD();
       const d = S.doc;
