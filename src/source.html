@@ -1780,9 +1780,28 @@ const Backup = {
       try { const p = await h.queryPermission({ mode: 'readwrite' }); this.setStatus(p === 'granted' ? 'connected' : 'reconnect'); } catch (e) { this.setStatus('reconnect'); }
       this.lastWrite = (await DB.get('lastWrite')) || 0;
     } else this.setStatus(this.supported ? 'none' : 'unsupported');
+    if (this.status === 'connected') await this.pull();
     if (this.status === 'connected' && this.dirtySince) this.schedule();
     setInterval(() => this.remind(), 60000);
+    const again = () => { if (document.visibilityState !== 'visible' || Date.now() - (this.lastFocusPull || 0) < 5000) return; this.lastFocusPull = Date.now(); this.pull(); };
+    document.addEventListener('visibilitychange', again); window.addEventListener('focus', again);
     setInterval(() => this.render(), 30000);
+  },
+  // Le fichier a été modifié ailleurs (autre ordinateur, via Google Drive…) : on fusionne d'abord, rien n'est écrasé
+  async pull() {
+    if (this.status !== 'connected' || !this.handle || this.pulling) return 0;
+    this.pulling = true;
+    try {
+      const f = await this.handle.getFile();
+      if (!f.size || f.lastModified <= Math.max(this.lastWrite || 0, this.lastPullMod || 0) + 1000) return 0;
+      const data = JSON.parse(await f.text()); this.lastPullMod = f.lastModified;
+      if (!data || !(+data.exported > (this.lastWrite || 0) + 500) || +data.exported === this.lastPullExp) return 0;
+      this.lastPullExp = +data.exported;
+      const added = await mergeBackup(data);
+      if (added) toast(`${added} élément${added > 1 ? 's' : ''} récupéré${added > 1 ? 's' : ''} depuis ta sauvegarde (modifiée sur un autre ordinateur).`, { duration: 5000 });
+      return added;
+    } catch (e) { console.warn('Lecture de la sauvegarde impossible', e); return 0; }
+    finally { this.pulling = false; }
   },
   touch() { if (!this.dirtySince) { this.dirtySince = Date.now(); DB.set('dirtySince', this.dirtySince); } this.render(); },
   schedule() { if (this.status !== 'connected') { this.render(); return; } clearTimeout(this.t); this.t = setTimeout(() => this.write(), 1500); },
@@ -1793,6 +1812,7 @@ const Backup = {
     this.writing = true; this.render('Sauvegarde…');
     try {
       await flushSave();
+      await this.pull();
       const data = this.payload();
       const w = await this.handle.createWritable(); await w.write(data); await w.close();
       if (this.dir) { try { const hd = await this.dir.getDirectoryHandle('Historique', { create: true }); const fh = await hd.getFileHandle(dayKey() + '.json', { create: true }); const w2 = await fh.createWritable(); await w2.write(data); await w2.close(); const names = []; for await (const k of hd.keys()) if (/^\d{4}-\d{2}-\d{2}\.json$/.test(k)) names.push(k); names.sort(); while (names.length > 30) await hd.removeEntry(names.shift()); } catch (e) { console.warn('historique', e); } }
@@ -4507,7 +4527,7 @@ const ASR_LIB = 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1/di
 const ASR_MODELS = {
   rapide: { label: 'Rapide', model: 'onnx-community/whisper-base', gpu: { encoder_model: 'fp32', decoder_model_merged: 'q4' }, cpu: 'q8', size: { gpu: '≈ 130 Mo', cpu: '≈ 80 Mo' }, d: 'Suit le cours en direct sur presque tous les ordinateurs. Quelques erreurs sur les noms propres.' },
   equilibre: { label: 'Équilibrée', model: 'onnx-community/whisper-small', gpu: { encoder_model: 'fp32', decoder_model_merged: 'q4' }, cpu: 'q8', size: { gpu: '≈ 450 Mo', cpu: '≈ 250 Mo' }, d: 'Nettement plus juste. En direct si ton ordinateur a une bonne carte graphique ; sinon, plutôt après le cours.' },
-  precis: { label: 'Précise', model: 'onnx-community/whisper-large-v3-turbo', gpu16: { encoder_model: 'fp16', decoder_model_merged: 'q4' }, needGpu16: true, size: { gpu: '≈ 1,5 Go' }, d: 'La meilleure qualité, proche d\'une transcription professionnelle. Demande une carte graphique récente.' },
+  precis: { label: 'Précise', model: 'onnx-community/whisper-large-v3-turbo', gpu16: { encoder_model: 'fp16', decoder_model_merged: 'q4' }, needGpu16: true, size: { gpu: '≈ 1,5 Go' }, d: 'La meilleure qualité, proche d\'une transcription professionnelle. Très lourde pour l\'ordinateur : à utiliser avec « Après le cours », sur secteur.' },
 };
 const ASR_LANGS = { french: 'Français', english: 'Anglais', dutch: 'Néerlandais', german: 'Allemand', spanish: 'Espagnol', italian: 'Italien' };
 
@@ -5014,9 +5034,10 @@ const Player = {
 const RecUI = {
   model() { return prefs.recModel || 'rapide'; },
   async defaults() {
+    if (prefs.recModel === 'precis' && prefs.recLive !== false && !prefs.recMig1) { prefs.recLive = false; prefs.recMig1 = true; savePrefs(); }
     if (prefs.recModel) return;
     const g = await Asr.gpu();
-    prefs.recModel = g && g.f16 ? 'precis' : g ? 'equilibre' : 'rapide'; prefs.recLive = true; savePrefs();
+    prefs.recModel = g ? 'equilibre' : 'rapide'; prefs.recLive = true; savePrefs();
   },
   sync(fast) {
     const b = $('recBtn'); if (!b) return;
@@ -5094,7 +5115,8 @@ const RecUI = {
     const apply = () => { const q = m.querySelector('input[name="rq"]:checked'); if (q) prefs.recModel = q.value; prefs.recLive = sg.querySelector('.on')?.dataset.v !== '0'; prefs.recKeepAudio = kp.querySelector('.on')?.dataset.v !== '0'; prefs.recLang = m.querySelector('#rqLang').value; prefs.recSeen = true; savePrefs(); };
     const c2 = m.querySelector('[data-close2]'); if (c2) c2.onclick = () => { closeModal(); };
     const go = m.querySelector('#rqGo'); if (go) go.onclick = () => { apply(); closeModal(); Rec.start(); };
-    const ok = m.querySelector('#rqOk'); if (ok) ok.onclick = () => { apply(); closeModal(); toast('Réglages enregistrés : ' + this.qualityLine() + '.'); };
+    const warn = () => { if (prefs.recModel === 'precis' && prefs.recLive !== false) toast('La qualité Précise en direct peut ralentir fortement ton ordinateur. Préfère « Après le cours ».', { duration: 7000 }); };
+    const ok = m.querySelector('#rqOk'); if (ok) ok.onclick = () => { apply(); closeModal(); warn(); toast('Réglages enregistrés : ' + this.qualityLine() + '.'); };
   },
   async importFile(f) {
     if (!f) return; if (!S.doc) return toast('Ouvre d\'abord le cours auquel relier cet enregistrement.');
