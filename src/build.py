@@ -5,7 +5,7 @@ F = os.path.join(H, 'fonts')
 fonts = [("Nunito",700,"normal","nunito-latin-700-normal.woff"),("Nunito",800,"normal","nunito-latin-800-normal.woff"),("Source Sans 3",400,"normal","source-sans-3-latin-400-normal.woff"),("Source Sans 3",400,"italic","source-sans-3-latin-400-italic.woff"),("Source Sans 3",600,"normal","source-sans-3-latin-600-normal.woff"),("Source Sans 3",700,"normal","source-sans-3-latin-700-normal.woff"),("Atkinson Hyperlegible",400,"normal","atkinson-hyperlegible-latin-400-normal.woff"),("Atkinson Hyperlegible",700,"normal","atkinson-hyperlegible-latin-700-normal.woff"),("OpenDyslexic",400,"normal","opendyslexic-latin-400-normal.woff"),("OpenDyslexic",700,"normal","opendyslexic-latin-700-normal.woff")]
 css = ''.join(f'@font-face{{font-family:"{n}";font-weight:{w};font-style:{s};font-display:swap;src:url(data:font/woff;base64,{base64.b64encode(open(os.path.join(F,p),"rb").read()).decode()}) format("woff");}}\n' for n,w,s,p in fonts)
 s = open(os.path.join(H,'source.html'), encoding='utf-8').read()
-parts = {'/*FONTS*/': css, '/*WORKER*/': open(os.path.join(H,'vendor/pdfjs/pdf.worker.min.js'),encoding='utf-8').read(), '/*PDFJS*/': open(os.path.join(H,'vendor/pdfjs/pdf.min.js'),encoding='utf-8').read(), '/*PDFLIB*/': open(os.path.join(H,'vendor/pdflib/pdf-lib.min.js'),encoding='utf-8').read()}
+parts = {'/*FONTS*/': css, '/*WORKER*/': open(os.path.join(H,'vendor/pdfjs/pdf.worker.min.js'),encoding='utf-8').read(), '/*PDFJS*/': open(os.path.join(H,'vendor/pdfjs/pdf.min.js'),encoding='utf-8').read(), '/*PDFLIB*/': open(os.path.join(H,'vendor/pdflib/pdf-lib.min.js'),encoding='utf-8').read(), '/*MAMMOTH*/': open(os.path.join(H,'vendor/mammoth/mammoth.browser.min.js'),encoding='utf-8').read()}
 for k, v in parts.items():
     assert s.count(k) == 1, k
     i = s.index(k); s = s[:i] + v + s[i+len(k):]
@@ -25,7 +25,7 @@ if True:
     man = {"name": "Atelier d'étude", "short_name": "Atelier", "id": "./", "start_url": "./", "scope": "./", "display": "standalone", "display_override": ["window-controls-overlay", "standalone"],
            "background_color": "#f4f4f3", "theme_color": "#23807a", "lang": "fr", "dir": "ltr", "description": "Ton cours en PDF à gauche, tes notes à droite. Hors ligne et sans compte.",
            "icons": [{"src": "icon-192.png", "sizes": "192x192", "type": "image/png"}, {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"}, {"src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}],
-           "file_handlers": [{"action": "./", "accept": {"application/pdf": [".pdf"]}}],
+           "file_handlers": [{"action": "./", "accept": {"application/pdf": [".pdf"], "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"]}}],
            "categories": ["education", "productivity"]}
     open('web/manifest.webmanifest', 'w', encoding='utf-8').write(_json.dumps(man, ensure_ascii=False, indent=1))
     sw = """// Atelier d'étude — fonctionnement hors ligne. Version : %s

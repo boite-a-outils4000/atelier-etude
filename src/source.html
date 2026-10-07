@@ -1090,15 +1090,15 @@ body.nb.nb-ref #refpane { flex: 1 1 auto !important; max-width: none !important;
       <button data-mode="revise" role="tab" title="Fiches, réponses masquées et progression (⌥R)">Réviser</button>
     </div>
     <span class="tb-sep needdoc"></span>
-    <button class="btn ghost" id="openBtn" title="Ouvrir un PDF (⌘O)"><svg class="i" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span class="lbl">Ouvrir</span></button>
+    <button class="btn ghost" id="openBtn" title="Ouvrir un PDF ou un document Word (⌘O)"><svg class="i" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span class="lbl">Ouvrir</span></button>
     <div class="dd"><button class="btn ghost" id="coursBtn" data-dd="ddCours" title="Bibliothèque, document à côté, lecture, sauvegarde"><svg class="i" viewBox="0 0 24 24"><path d="M4 19V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zm0 0a2 2 0 0 0 2 2h13"/></svg><span class="lbl">Cours</span><span class="caret">▾</span></button></div>
     <div class="dd needdoc"><button class="btn ghost" id="expBtn" data-dd="ddExport" title="Exporter, partager et travailler à plusieurs"><svg class="i" viewBox="0 0 24 24"><path d="M12 15V3m0 0L8 7m4-4l4 4M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg><span class="lbl">Exporter</span><span class="caret">▾</span></button></div>
     <div class="dd"><button class="btn ghost icon" id="viewBtn" data-dd="ddView" title="Affichage : thème, disposition, texte, confort" aria-label="Affichage"><svg class="i" viewBox="0 0 24 24"><path d="M3 19l5-14 5 14M4.8 14h6.4M15 19v-6.5a3 3 0 0 1 6 0V19M15 15.5h6"/></svg></button></div>
     <button class="btn ghost icon" id="helpBtn" title="Raccourcis clavier et aide (?)" aria-label="Aide">?</button>
     <button class="hidden" id="themeBtn" tabindex="-1" aria-hidden="true"></button>
-    <input type="file" id="fileInput" accept="application/pdf,.pdf,application/json,.json" hidden>
+    <input type="file" id="fileInput" accept="application/pdf,.pdf,.docx,.doc,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,application/json,.json" hidden>
     <input type="file" id="jsonInput" accept="application/json,.json" hidden>
-    <input type="file" id="refInput" accept="application/pdf,.pdf" hidden>
+    <input type="file" id="refInput" accept="application/pdf,.pdf,.docx,.doc,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword" hidden>
     <input type="file" id="ocrInput" accept="image/*,.heic,.heif" multiple hidden>
     <input type="file" id="audioInput" accept="audio/*,.m4a,.mp3,.wav,.webm,.ogg,.aac,.opus" hidden>
   </div>
@@ -1117,7 +1117,7 @@ body.nb.nb-ref #refpane { flex: 1 1 auto !important; max-width: none !important;
 <div class="dd-menu wide" id="ddCours">
   <h5>Mes cours</h5>
   <button id="libBtn"><span class="ico"><svg class="i" viewBox="0 0 24 24"><path d="M4 19V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zm0 0a2 2 0 0 0 2 2h13"/></svg></span><span class="tx">Bibliothèque<span class="d">Tous les cours annotés</span></span></button>
-  <button data-c="open"><span class="ico"><svg class="i" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span><span class="tx">Ouvrir un PDF…</span><span class="k kbd">⌘O</span></button>
+  <button data-c="open"><span class="ico"><svg class="i" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span><span class="tx">Ouvrir un PDF ou un Word…</span><span class="k kbd">⌘O</span></button>
   <button id="nbItem"><span class="ico"><svg class="i" viewBox="0 0 24 24"><path d="M6 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6z"/><path d="M6 3v18M9.5 8h6M9.5 12h6"/></svg></span><span class="tx">Nouveau carnet sans document<span class="d">Pour un cours sans support ; à rattacher au PDF plus tard</span></span></button>
   <button id="vidItem"><span class="ico"><svg class="i" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="3.5"/><path d="M10 9.2v5.6l4.8-2.8z"/></svg></span><span class="tx">Ouvrir une vidéo YouTube…<span class="d">Notes avec le minutage, pause automatique</span></span></button>
   <button data-c="close" class="needdoc-item"><span class="ico"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></span><span class="tx">Fermer ce cours<span class="d">Retour à l'accueil ; tes notes restent enregistrées</span></span></button>
@@ -1184,16 +1184,16 @@ body.nb.nb-ref #refpane { flex: 1 1 auto !important; max-width: none !important;
         <div class="home">
           <div class="home-h">
             <h1 id="homeTitle">Ouvre un cours pour commencer</h1>
-            <p>Ton cours en PDF à gauche, tes notes à droite.</p>
+            <p>Ton cours en PDF ou en Word à gauche, tes notes à droite.</p>
           </div>
           <p class="home-mig hidden" id="homeMig">Tu utilisais déjà l'Atelier en fichier ? Choisis ton dossier de sauvegarde (menu <b>Cours → Sauvegarde et historique</b>) : tes notes reviennent automatiquement. Tu peux aussi importer un fichier de sauvegarde (.json).</p>
           <div class="recents hidden" id="recents"><h3>Reprendre un cours</h3><div id="recentList"></div></div>
           <div class="drop" id="drop">
-            <button class="btn primary lg" id="openBtn2"><svg class="i" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Ouvrir un nouveau PDF</button>
+            <button class="btn primary lg" id="openBtn2"><svg class="i" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Ouvrir un PDF ou un Word</button>
             <p>ou glisse un fichier ici · <span class="kbd">⌘O</span></p>
             <button class="btn home-nb" id="nbBtn2"><svg class="i" viewBox="0 0 24 24"><path d="M6 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6z"/><path d="M6 3v18M9.5 8h6M9.5 12h6"/></svg>Carnet sans document</button>
             <button class="btn home-vid" id="vidBtn2"><svg class="i" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="3.5"/><path d="M10 9.2v5.6l4.8-2.8z"/></svg>Prendre des notes sur une vidéo YouTube</button>
-            <p class="small">Un PowerPoint s'exporte en PDF via Fichier → Exporter → PDF. Une sauvegarde de notes, des QCM ou les notes d'un collègue (.json) s'ouvrent aussi ici.</p>
+            <p class="small">Un document Word (.docx) s'ouvre directement. Un PowerPoint s'exporte en PDF via Fichier → Exporter → PDF. Une sauvegarde de notes, des QCM ou les notes d'un collègue (.json) s'ouvrent aussi ici.</p>
           </div>
         </div>
       </div>
@@ -1354,6 +1354,7 @@ body.nb.nb-ref #refpane { flex: 1 1 auto !important; max-width: none !important;
 <div class="toast" id="toast"><span id="toastTxt"></span><button id="toastAct" class="hidden"></button></div>
 
 <script id="worker-src" type="text/plain">/*WORKER*/</script>
+<script id="mammoth-src" type="text/plain">/*MAMMOTH*/</script>
 <script>/*PDFJS*/</script>
 <script>/*PDFLIB*/</script>
 <script>
@@ -1519,7 +1520,7 @@ const workerReady = (async () => {
 })();
 
 /* =================== Ouverture des fichiers =================== */
-const PDF_TYPES = [{ description: 'Cours (PDF) ou sauvegarde de notes (.json)', accept: { 'application/pdf': ['.pdf'], 'application/json': ['.json'] } }];
+const PDF_TYPES = [{ description: 'Cours (PDF ou Word) ou sauvegarde de notes (.json)', accept: { 'application/pdf': ['.pdf'], 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'], 'application/msword': ['.doc'], 'application/json': ['.json'] } }];
 async function pickPdf() {
   if (window.showOpenFilePicker) {
     try { const [h] = await showOpenFilePicker({ types: PDF_TYPES, id: 'cours' }); const f = await h.getFile(); if (/\.json$/i.test(f.name) || f.type === 'application/json') return importBackupFile(f); return openFile(f, h); }
@@ -1535,9 +1536,9 @@ document.addEventListener('drop', (e) => {
   if (!e.dataTransfer?.files?.length) return;
   e.preventDefault(); $('drop').classList.remove('over');
   const items = [...e.dataTransfer.items]; const files = [...e.dataTransfer.files];
-  if (e.target.closest && e.target.closest('#refpane')) { const rf = files.find(f => /\.pdf$/i.test(f.name)); if (rf) { loadRef(rf); return; } }
-  const i = files.findIndex(f => /\.pdf$/i.test(f.name) || f.type === 'application/pdf');
-  if (i < 0) { const j = files.find(f => /\.json$/i.test(f.name)); if (j) importBackupFile(j); else { const im = files.filter(f => /^image\//.test(f.type) || /\.(jpe?g|png|webp|heic|heif)$/i.test(f.name)); if (im.length && S.doc) Ocr.files(im); else toast('Ce fichier n\'est pas un PDF.'); } return; }
+  if (e.target.closest && e.target.closest('#refpane')) { const rf = files.find(f => /\.pdf$/i.test(f.name) || Docx.accepts(f)); if (rf) { loadRef(rf); return; } }
+  const i = files.findIndex(f => /\.pdf$/i.test(f.name) || f.type === 'application/pdf' || Docx.accepts(f));
+  if (i < 0) { const j = files.find(f => /\.json$/i.test(f.name)); if (j) importBackupFile(j); else { const im = files.filter(f => /^image\//.test(f.type) || /\.(jpe?g|png|webp|heic|heif)$/i.test(f.name)); if (im.length && S.doc) Ocr.files(im); else toast('Ce fichier n\'est pas un PDF ni un document Word.'); } return; }
   const hp = items[i] && items[i].getAsFileSystemHandle ? items[i].getAsFileSystemHandle() : null;
   (hp ? hp.catch(() => null) : Promise.resolve(null)).then(h => openFile(files[i], h));
 });
@@ -1548,6 +1549,7 @@ async function openFile(file, handle, direct) {
   $('loading').classList.add('on'); $('welcome').classList.add('hidden');
   try {
     await workerReady;
+    file = await Docx.ensurePdf(file);
     if (S.doc) { S.doc.lastPage = S.current; await flushSave(); }
     const bytes = new Uint8Array(await file.arrayBuffer());
     const pdf = await pdfjsLib.getDocument({ data: bytes.slice(0), isEvalSupported: false }).promise;
@@ -1555,17 +1557,18 @@ async function openFile(file, handle, direct) {
     if (handle) DB.set('pdf:' + fp, handle);
     const open = S.tabs.find(t => t.fp === fp);
     if (open) { try { pdf.destroy(); } catch (e) {} await activateTab(open); return; }
-    let title = file.name.replace(/\.pdf$/i, '').replace(/[_]+/g, ' ').trim();
+    let title = Docx.base(file.name).replace(/[_]+/g, ' ').trim();
     try { const md = await pdf.getMetadata(); if (md?.info?.Title && md.info.Title.trim().length > 3) title = md.info.Title.trim(); } catch (e) {}
     let doc = S.docs.get(fp); let isNew = false;
-    if (!doc) { doc = normalizeDoc({ fp, name: file.name, title, notes: [], created: Date.now() }); S.docs.set(fp, doc); isNew = true; }
+    if (!doc) { doc = normalizeDoc({ fp, name: file.name, title, notes: [], created: Date.now() }); if (file.fromWord) doc.word = true; S.docs.set(fp, doc); isNew = true; }
     doc.name = file.name; doc.pages = pdf.numPages;
     const tab = { fp, pdf, bytes, name: file.name };
     S.tabs.push(tab);
     if (S.tabs.length > 8) { const old = S.tabs.find(t => t.fp !== S.fp && t !== tab); if (old) { try { old.pdf.destroy(); } catch (e) {} S.tabs.splice(S.tabs.indexOf(old), 1); } }
     await activateTab(tab, true);
     if (isNew) setTimeout(() => Versions.detect(doc), 400);
-  } catch (err) { console.error(err); toast('Impossible d\'ouvrir ce PDF.'); if (!S.doc) $('welcome').classList.remove('hidden'); }
+    if (isNew && file.fromWord) toast('Document Word converti en PDF pour l\'Atelier. Les textes, titres, listes, tableaux et images sont repris ; la mise en page (polices, centrage, couleurs) est simplifiée.', { duration: 7000 });
+  } catch (err) { console.error(err); toast(err.userMsg || 'Impossible d\'ouvrir ce PDF.', { duration: err.userMsg ? 9000 : 3000 }); if (!S.doc) $('welcome').classList.remove('hidden'); }
   finally { $('loading').classList.remove('on'); }
 }
 async function activateTab(tab, first) {
@@ -2291,7 +2294,7 @@ $('thumbsBtn').onclick = () => { prefs.thumbs = !prefs.thumbs; savePrefs(); appl
 const REF = { pdf: null, name: '', pages: [], scale: 1, fit: true, current: 1 };
 const refViewer = $('refViewer');
 async function pickRef() {
-  if (window.showOpenFilePicker) { try { const [h] = await showOpenFilePicker({ types: [{ description: 'Document PDF', accept: { 'application/pdf': ['.pdf'] } }], id: 'reference' }); return loadRef(await h.getFile(), h); } catch (e) { if (e.name !== 'AbortError') $('refInput').click(); return; } }
+  if (window.showOpenFilePicker) { try { const [h] = await showOpenFilePicker({ types: [{ description: 'Document PDF ou Word', accept: { 'application/pdf': ['.pdf'], 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'], 'application/msword': ['.doc'] } }], id: 'reference' }); return loadRef(await h.getFile(), h); } catch (e) { if (e.name !== 'AbortError') $('refInput').click(); return; } }
   $('refInput').click();
 }
 $('refInput').onchange = (e) => { const f = e.target.files[0]; e.target.value = ''; if (f) loadRef(f); };
@@ -2301,9 +2304,10 @@ $('refClose').onclick = closeRef;
 async function loadRef(file, handle) {
   await workerReady;
   try {
+    file = await Docx.ensurePdf(file);
     const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(await file.arrayBuffer()), isEvalSupported: false }).promise;
     if (REF.pdf) { try { REF.pdf.destroy(); } catch (e) {} }
-    REF.pdf = pdf; REF.name = file.name.replace(/\.pdf$/i, '').replace(/_+/g, ' '); REF.fit = true; REF.current = 1;
+    REF.pdf = pdf; REF.name = Docx.base(file.name).replace(/_+/g, ' '); REF.fit = true; REF.current = 1;
     try { const md = await pdf.getMetadata(); if (md?.info?.Title && md.info.Title.trim().length > 3) REF.name = md.info.Title.trim(); } catch (e) {}
     $('refName').textContent = REF.name; $('refName').title = file.name; $('refTotal').textContent = '/ ' + pdf.numPages;
     const wrap = $('refPages'); wrap.innerHTML = ''; REF.pages = [];
@@ -2315,7 +2319,7 @@ async function loadRef(file, handle) {
     showRefPane(true); refViewer.scrollTop = 0;
     if (typeof Nb !== 'undefined' && Nb.active()) { S.doc.refName = REF.name; saveSoon(true); if (handle) DB.set('nbref:' + S.doc.fp, handle); Nb.stage(); }
     toast('Document ouvert à côté. Sélectionne un passage pour le citer dans tes notes.', { duration: 3500 });
-  } catch (e) { console.error(e); toast('Impossible d\'ouvrir ce document.'); }
+  } catch (e) { console.error(e); toast(e.userMsg || 'Impossible d\'ouvrir ce document.', { duration: e.userMsg ? 9000 : 3000 }); }
 }
 function showRefPane(on) {
   document.body.classList.toggle('nb-ref', !!on && typeof Nb !== 'undefined' && Nb.active());
@@ -4509,7 +4513,7 @@ const PWA = {
   init() {
     if (window.matchMedia && matchMedia('(display-mode: standalone)').matches) document.body.classList.add('standalone');
     // Ouvrir un PDF depuis le Finder (« Ouvrir avec Atelier d'étude »)
-    if ('launchQueue' in window) launchQueue.setConsumer(async (params) => { for (let k = 0; k < 100 && !S.booted; k++) await sleep(100); for (const h of (params.files || [])) { try { const f = await h.getFile(); if (/\.pdf$/i.test(f.name) || f.type === 'application/pdf') { await openFile(f, h); } } catch (e) {} } });
+    if ('launchQueue' in window) launchQueue.setConsumer(async (params) => { for (let k = 0; k < 100 && !S.booted; k++) await sleep(100); for (const h of (params.files || [])) { try { const f = await h.getFile(); if (/\.pdf$/i.test(f.name) || f.type === 'application/pdf' || Docx.is(f)) { await openFile(f, h); } } catch (e) {} } });
     window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); this.deferred = e; this.sync(); });
     window.addEventListener('appinstalled', () => { this.deferred = null; this.sync(); toast('Atelier d\'étude est installé : tu le trouves dans tes applications.'); });
     if (this.web && 'serviceWorker' in navigator) {
@@ -5518,7 +5522,7 @@ const Nb = {
   },
   // Un PDF ouvert depuis un carnet : à côté (le carnet reste ouvert) ou comme nouveau cours
   askOpen(file, handle) {
-    const m = openModal('Ouvrir « ' + esc(file.name.replace(/\.pdf$/i, '')) + ' »', `<p>Tu es dans un carnet. Que veux-tu faire de ce PDF ?</p>
+    const m = openModal('Ouvrir « ' + esc(Docx.base(file.name)) + ' »', `<p>Tu es dans un carnet. Que veux-tu faire de ce ${Docx.accepts(file) ? 'document Word' : 'PDF'} ?</p>
       <div class="nb-acts" style="margin:12px 0 4px"><button class="btn primary" id="nbAskSide">À côté de mon carnet<span class="small" style="margin-left:6px;opacity:.85">tu continues à écrire tes notes ici</span></button>
       <button class="btn" id="nbAskTab">Comme un nouveau cours<span class="small" style="margin-left:6px;opacity:.7">dans un autre onglet, avec ses propres notes</span></button></div>`, 'sm');
     m.querySelector('#nbAskSide').onclick = () => { closeModal(); loadRef(file, handle); };
@@ -5545,7 +5549,7 @@ const Nb = {
       <p>Pour un cours sans support, ou quand les slides arrivent après le cours. Tes notes s'écrivent à droite, dans l'ordre où tu les prends.</p>
       <p class="small">Créé le ${new Date(d.created || Date.now()).toLocaleDateString('fr-BE', { weekday: 'long', day: 'numeric', month: 'long' })}.</p>
       <div class="nb-acts">
-        <button class="btn primary" data-nb="ref"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="8" height="16" rx="1.5"/><rect x="13" y="4" width="8" height="16" rx="1.5"/></svg>Afficher un PDF à côté…</button>
+        <button class="btn primary" data-nb="ref"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="8" height="16" rx="1.5"/><rect x="13" y="4" width="8" height="16" rx="1.5"/></svg>Afficher un PDF ou un Word à côté…</button>
         ${d.refName ? `<button class="btn" data-nb="reopen">Rouvrir « ${esc(clip(d.refName, 40))} »</button>` : ''}
         <button class="btn" data-nb="ocr"><svg class="i" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Lire des photos de notes…</button>
         <button class="btn" data-nb="rec">${ICON_MIC}Enregistrer le cours</button>
@@ -6092,6 +6096,312 @@ Règles :
   },
 };
 window.Ocr = Ocr;
+
+
+/* =================== Documents Word (.docx) → PDF, pour les ouvrir comme un cours =================== */
+const Docx = {
+  MIME: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  is(f) { return !!f && (/\.docx$/i.test(f.name || '') || f.type === this.MIME); },
+  other(f) { return !!f && (/\.(doc|odt|rtf|pages)$/i.test(f.name || '') || f.type === 'application/msword'); },
+  accepts(f) { return this.is(f) || this.other(f); },
+  base(name) { return (name || '').replace(/\.(pdf|docx?|odt|rtf|pages)$/i, ''); },
+  lib() {
+    if (window.mammoth) return Promise.resolve(window.mammoth);
+    if (!this._p) this._p = new Promise((res, rej) => {
+      const src = $('mammoth-src'); if (!src) return rej(new Error('lib'));
+      const s = document.createElement('script'); s.src = URL.createObjectURL(new Blob([src.textContent], { type: 'text/javascript' }));
+      s.onload = () => window.mammoth ? res(window.mammoth) : rej(new Error('lib')); s.onerror = () => rej(new Error('lib')); document.head.appendChild(s);
+    }).catch(e => { this._p = null; throw e; });
+    return this._p;
+  },
+  fail(msg) { const e = new Error(msg); e.userMsg = msg; return e; },
+  // Renvoie le fichier tel quel si ce n'est pas un Word, sinon un PDF fabriqué à partir du Word
+  async ensurePdf(file) {
+    if (!this.accepts(file)) return file;
+    if (!this.is(file)) {
+      const ext = ((file.name || '').match(/\.(\w+)$/) || [, ''])[1].toLowerCase();
+      throw this.fail(ext === 'doc' ? 'Ce fichier Word est à l\'ancien format (.doc). Ouvre-le dans Word et choisis Fichier → Enregistrer sous → « Document Word (.docx) » ou « PDF ».'
+        : 'Ce format n\'est pas pris en charge. Ouvre le fichier et exporte-le en PDF (ou en .docx).');
+    }
+    const buf = await file.arrayBuffer(); const u8 = new Uint8Array(buf);
+    if (u8[0] !== 0x50 || u8[1] !== 0x4b) throw this.fail('Ce fichier Word n\'a pas pu être lu : il est peut-être abîmé ou protégé par un mot de passe. Essaie de l\'enregistrer en PDF depuis Word.');
+    toast('Conversion du document Word…', { duration: 30000 });
+    let html;
+    try {
+      const m = await this.lib();
+      const r = await m.convertToHtml({ arrayBuffer: buf }, { ignoreEmptyParagraphs: false, styleMap: ["u => u", "strike => s", "highlight => mark", "br[type='page'] => hr.pb:fresh",
+        "p[style-name='Title'] => h1:fresh", "p[style-name='Titre'] => h1:fresh", "p[style-name='Subtitle'] => h2:fresh", "p[style-name='Sous-titre'] => h2:fresh"] });
+      html = r.value;
+    } catch (e) { console.error(e); $('toast').classList.remove('on'); throw this.fail(e.message === 'lib' ? 'Le module Word n\'a pas pu se charger.' : 'Ce fichier Word n\'a pas pu être lu. Essaie de l\'enregistrer en PDF depuis Word.'); }
+    let id;
+    try { id = [...new Uint8Array(await crypto.subtle.digest('SHA-256', buf))].slice(0, 16).map(b => b.toString(16).padStart(2, '0')).join(''); }
+    catch (e) { let h1 = 0x811c9dc5, h2 = 0x01000193; for (let i = 0; i < u8.length; i++) { h1 = Math.imul(h1 ^ u8[i], 16777619) >>> 0; h2 = Math.imul(h2 + u8[i], 2246822519) >>> 0; } id = h1.toString(16).padStart(8, '0') + h2.toString(16).padStart(8, '0') + u8.length.toString(16).padStart(16, '0'); }
+    const bytes = await this.build(html, this.base(file.name).replace(/_+/g, ' ').trim(), 'd0c5' + id.slice(4));
+    $('toast').classList.remove('on');
+    const out = new File([bytes], file.name, { type: 'application/pdf', lastModified: file.lastModified });
+    out.fromWord = true; return out;
+  },
+
+  /* ---------- Mise en page ---------- */
+  async build(html, title, idHex) {
+    const { PDFDocument, StandardFonts, rgb, PDFHexString, PDFString, PDFName } = PDFLib;
+    const pdf = await PDFDocument.create();
+    pdf.setTitle(title || 'Document Word'); pdf.setCreator('Atelier d\'étude (conversion Word)'); pdf.setProducer('Atelier d\'étude');
+    pdf.context.trailerInfo.ID = pdf.context.obj([PDFHexString.of(idHex), PDFHexString.of(idHex)]);
+    const F = { r: await pdf.embedFont(StandardFonts.Helvetica), b: await pdf.embedFont(StandardFonts.HelveticaBold), i: await pdf.embedFont(StandardFonts.HelveticaOblique), bi: await pdf.embedFont(StandardFonts.HelveticaBoldOblique), sym: await pdf.embedFont(StandardFonts.Symbol), zd: await pdf.embedFont(StandardFonts.ZapfDingbats) };
+    const INK = rgb(0.11, 0.11, 0.12), MUTED = rgb(0.45, 0.45, 0.47), LINK = rgb(0.06, 0.36, 0.7), RULE = rgb(0.72, 0.72, 0.74), HEAD = rgb(0.93, 0.94, 0.95), MARK = rgb(1, 0.92, 0.45);
+    const PW = 595.28, PH = 841.89, ML = 62, MR = 62, MT = 60, MB = 64, CW = PW - ML - MR, AV = PH - MT - MB;
+    // ---- caractères : texte (WinAnsi), sinon Symbol, sinon ZapfDingbats
+    const cmap = new Map();
+    const fam = (ch) => { if (cmap.has(ch)) return cmap.get(ch); let r = null; for (const k of ['r', 'sym', 'zd']) { try { F[k].encodeText(ch); r = k; break; } catch (e) {} } cmap.set(ch, r); return r; };
+    const clean = (t) => t.replace(/[​-‍⁠﻿­]/g, '').replace(/[  ]/g, ' ').replace(/[ - 　]/g, ' ').replace(/[‐‑]/g, '-').replace(/\t/g, '    ').replace(/[\r\n]+/g, ' ');
+    const fontOf = (st) => F[st.b && st.i ? 'bi' : st.b ? 'b' : st.i ? 'i' : 'r'];
+    const sizeOf = (st) => st.sup || st.sub ? st.size * 0.68 : st.size;
+    // morceaux d'une chaîne selon la police capable de l'afficher
+    const pieces = (t, st) => { const out = []; let cur = null; for (const ch of t) { let k = fam(ch); let c = ch; if (!k) { c = '?'; k = 'r'; } const f = k === 'r' ? fontOf(st) : F[k]; if (cur && cur.f === f) cur.t += c; else { cur = { t: c, f }; out.push(cur); } } return out; };
+    const wOf = (t, st) => pieces(t, st).reduce((a, p) => a + p.f.widthOfTextAtSize(p.t, sizeOf(st)), 0);
+
+    // ---- lecture du HTML produit à partir du Word
+    html = html.replace(/<hr class="pb" \/>\s*<\/p>/g, '</p><hr class="pb" />');
+    const dom = new DOMParser().parseFromString('<div id="r">' + html + '</div>', 'text/html');
+    const root = dom.getElementById('r');
+    root.querySelectorAll('a[href^="#footnote-ref"],a[href^="#endnote-ref"],a[href^="#comment-ref"]').forEach(a => a.remove());
+    const INLINE = /^(SPAN|STRONG|B|EM|I|U|S|DEL|STRIKE|SUP|SUB|A|MARK|BR|IMG|SMALL|CODE)$/;
+    const imgs = [];
+    const runsOf = (nodes, st0) => {
+      const out = [];
+      const walk = (n, st) => {
+        if (n.nodeType === 3) {
+          const t = clean(n.data); if (!t) return;
+          // chiffres en indice / exposant Unicode (CO₂, m⁴) : dessinés en petit
+          t.split(/([\u2080-\u2089\u2070\u2074-\u2079]+)/).forEach(part => {
+            if (!part) return;
+            if (/^[\u2080-\u2089]+$/.test(part)) out.push({ t: [...part].map(c => String.fromCharCode(c.charCodeAt(0) - 0x2050)).join(''), st: { ...st, sub: 1 } });
+            else if (/^[\u2070\u2074-\u2079]+$/.test(part)) out.push({ t: [...part].map(c => String.fromCharCode(c.charCodeAt(0) - 0x2040)).join(''), st: { ...st, sup: 1 } });
+            else out.push({ t: part, st });
+          });
+          return;
+        }
+        if (n.nodeType !== 1) return;
+        const tg = n.tagName; let s = st;
+        if (tg === 'BR') { out.push({ br: 1 }); return; }
+        if (tg === 'IMG') { out.push({ img: n }); return; }
+        if (tg === 'STRONG' || tg === 'B') s = { ...s, b: 1 };
+        else if (tg === 'EM' || tg === 'I') s = { ...s, i: 1 };
+        else if (tg === 'U') s = { ...s, u: 1 };
+        else if (tg === 'S' || tg === 'DEL' || tg === 'STRIKE') s = { ...s, s: 1 };
+        else if (tg === 'SUP') s = { ...s, sup: 1 };
+        else if (tg === 'SUB') s = { ...s, sub: 1 };
+        else if (tg === 'MARK') s = { ...s, hl: 1 };
+        else if (tg === 'A') { const h = n.getAttribute('href') || ''; if (/^(https?:|mailto:)/i.test(h)) s = { ...s, link: h }; }
+        n.childNodes.forEach(c => walk(c, s));
+      };
+      nodes.forEach(n => walk(n, st0));
+      return out;
+    };
+    // ---- découpe en lignes
+    const lines = (runs, width, st0) => {
+      const atoms = []; let word = null;
+      for (const r of runs) {
+        if (r.br) { word = null; atoms.push({ br: 1 }); continue; }
+        for (const part of r.t.split(/(\s+)/)) {
+          if (!part) continue;
+          if (/^\s+$/.test(part) && !/^ +$/.test(part)) { word = null; atoms.push({ sp: 1, t: part.replace(/ /g, ' '), st: r.st }); }
+          else { if (!word) { word = { fr: [] }; atoms.push(word); } word.fr.push({ t: part, st: r.st }); }
+        }
+      }
+      const out = []; let cur = [], x = 0, pend = null;
+      const flush = (force) => { if (cur.length || force) out.push(cur); cur = []; x = 0; pend = null; };
+      for (const a of atoms) {
+        if (a.br) { flush(true); continue; }
+        if (a.sp) { if (cur.length) pend = a; continue; }
+        const ws = a.fr.map(f => wOf(f.t, f.st)), w = ws.reduce((p, q) => p + q, 0);
+        const spw = pend ? wOf(pend.t, pend.st) : 0;
+        if (cur.length && x + spw + w > width) flush();
+        if (!cur.length && w > width) { // mot trop long : coupé au caractère
+          for (const f of a.fr) for (const ch of f.t) { const cw = wOf(ch, f.st); if (x + cw > width && cur.length) flush(); cur.push({ t: ch, st: f.st, x, w: cw }); x += cw; }
+          continue;
+        }
+        if (cur.length && pend) { cur.push({ t: pend.t, st: pend.st, x, w: spw, sp: 1 }); x += spw; }
+        pend = null;
+        a.fr.forEach((f, k) => { cur.push({ t: f.t, st: f.st, x, w: ws[k] }); x += ws[k]; });
+      }
+      flush(false);
+      return out.map(items => { const sz = Math.max(st0.size, ...items.map(it => it.st.size)); return { items, sz, h: sz * (st0.lh || 1.32) }; });
+    };
+    const drawLine = (page, L, x0, top) => {
+      const base = PH - top - L.sz * 1.02;
+      if (L.mark) { const m = L.mark; let x = x0 + m.dx; for (const p of pieces(m.t, m.st)) { page.drawText(p.t, { x, y: base, size: m.st.size, font: p.f, color: m.st.color || INK }); x += p.f.widthOfTextAtSize(p.t, m.st.size); } }
+      // fusion des morceaux de même style (le texte reste sélectionnable avec ses espaces)
+      const segs = []; for (const it of L.items) { const p = segs[segs.length - 1]; if (p && p.st === it.st) { p.t += it.t; p.w = it.x + it.w - p.x; } else segs.push({ t: it.t, st: it.st, x: it.x, w: it.w }); }
+      for (const g of segs) if (g.st.hl) page.drawRectangle({ x: x0 + g.x - 0.5, y: base - g.st.size * 0.24, width: g.w + 1, height: g.st.size * 1.12, color: MARK });
+      for (const g of segs) {
+        const st = g.st, sz = sizeOf(st), rise = st.sup ? st.size * 0.36 : st.sub ? -st.size * 0.14 : 0, col = st.link ? LINK : (st.color || INK);
+        let x = x0 + g.x;
+        for (const p of pieces(g.t, st)) { page.drawText(p.t, { x, y: base + rise, size: sz, font: p.f, color: col }); x += p.f.widthOfTextAtSize(p.t, sz); }
+        const tw = g.t.replace(/\s+$/, '') === g.t ? g.w : g.w - wOf(g.t.slice(g.t.replace(/\s+$/, '').length), st);
+        if (st.u || st.link) page.drawLine({ start: { x: x0 + g.x, y: base - 1.6 }, end: { x: x0 + g.x + tw, y: base - 1.6 }, thickness: 0.6, color: col });
+        if (st.s) page.drawLine({ start: { x: x0 + g.x, y: base + sz * 0.3 }, end: { x: x0 + g.x + tw, y: base + sz * 0.3 }, thickness: 0.7, color: col });
+        if (st.link) { try { const an = pdf.context.register(pdf.context.obj({ Type: 'Annot', Subtype: 'Link', Rect: [x0 + g.x, base - 3, x0 + g.x + tw, base + sz], Border: [0, 0, 0], A: { Type: 'Action', S: 'URI', URI: PDFString.of(st.link) } })); page.node.addAnnot(an); } catch (e) {} }
+      }
+    };
+    // ---- images
+    const embedImg = async (el) => {
+      const src = el.getAttribute('src') || ''; const m = src.match(/^data:([^;,]+);base64,(.*)$/);
+      if (!m) return null;
+      const type = m[1].toLowerCase(); let bytes;
+      const b64 = (s) => { const bin = atob(s); const a = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i); return a; };
+      try {
+        if (type === 'image/png') return await pdf.embedPng(b64(m[2]));
+        if (type === 'image/jpeg' || type === 'image/jpg') return await pdf.embedJpg(b64(m[2]));
+      } catch (e) {}
+      try { // autre format (gif, bmp, webp…) : passage par le navigateur
+        const im = new Image(); im.src = src; await im.decode();
+        const c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight; const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(im, 0, 0);
+        bytes = b64(c.toDataURL('image/png').split(',')[1]); return await pdf.embedPng(bytes);
+      } catch (e) { return { bad: (type.split('/')[1] || '?').replace(/^x-/, '').toUpperCase() }; }
+    };
+    const imgBox = async (el, x, width) => {
+      const im = await embedImg(el);
+      if (!im || im.bad) { const L = lines([{ t: `[Image non affichable${im && im.bad ? ' (' + im.bad + ')' : ''}]`, st: { size: 9.5, i: 1, color: MUTED } }], width, { size: 9.5 }); return L.map(l => ({ x, h: l.h, draw: (pg, x0, top) => drawLine(pg, l, x0, top) })); }
+      let w = im.width * 0.75, h = im.height * 0.75; const k = Math.min(1, width / w, (AV * 0.55) / h); w *= k; h *= k;
+      return [{ gap: 4 }, { x, h, draw: (pg, x0, top) => pg.drawImage(im, { x: x0, y: PH - top - h, width: w, height: h }) }, { gap: 4 }];
+    };
+    // ---- paragraphe (avec images éventuelles) → boîtes
+    const para = async (nodes, x, width, st, o = {}) => {
+      const runs = runsOf(nodes, st); const out = [];
+      if (o.before) out.push({ gap: o.before });
+      let buf = [], first = true;
+      const emit = () => {
+        const has = buf.some(r => r.br || (r.t && r.t.trim())) || (first && !runs.some(r => r.img));
+        if (has || (first && o.mark)) {
+          const ls = lines(buf, width, st);
+          if (!ls.length) ls.push({ items: [], sz: st.size, h: st.size * (st.lh || 1.32) });
+          ls.forEach((l, k) => { if (first && k === 0 && o.mark) l.mark = o.mark; out.push({ x, h: l.h, keep: o.keep, draw: (pg, x0, top) => drawLine(pg, l, x0, top) }); });
+          first = false;
+        }
+        buf = [];
+      };
+      for (const r of runs) { if (r.img) { emit(); first = false; out.push(...await imgBox(r.img, x, width)); } else buf.push(r); }
+      emit();
+      if (o.after) out.push({ gap: o.after });
+      return out;
+    };
+    const BODY = { size: 11, lh: 1.34 };
+    const HS = { H1: [18, 16, 6], H2: [15, 14, 5], H3: [13, 11, 4], H4: [12, 10, 3], H5: [11, 8, 2], H6: [11, 8, 2] };
+    // ---- conteneur (corps, élément de liste, cellule)
+    const container = async (el, x, width, st, ctx = {}) => {
+      const out = []; let inl = [];
+      const flushInl = async () => { if (inl.some(n => n.nodeType === 1 || n.data.trim())) out.push(...await para(inl, x, width, st, { after: ctx.cell || ctx.li ? 2 : 6 })); inl = []; };
+      for (const n of [...el.childNodes]) {
+        if (n.nodeType === 3 || (n.nodeType === 1 && INLINE.test(n.tagName))) { inl.push(n); continue; }
+        if (n.nodeType !== 1) continue;
+        await flushInl();
+        const tg = n.tagName;
+        if (tg === 'P') out.push(...await para([...n.childNodes], x, width, st, { after: ctx.cell ? 2 : ctx.li ? 2 : 6 }));
+        else if (HS[tg]) { const [sz, bf, af] = HS[tg]; out.push(...await para([...n.childNodes], x, width, { ...st, size: ctx.cell ? st.size + 1 : sz, b: 1, lh: 1.22 }, { before: ctx.cell ? 2 : bf, after: af, keep: 1 })); }
+        else if (tg === 'UL' || tg === 'OL') {
+          const note = tg === 'OL' && n.querySelector(':scope > li[id^="footnote-"], :scope > li[id^="endnote-"]');
+          let lst = st;
+          if (note) { lst = { size: 9, lh: 1.3 }; out.push({ gap: 10 }, { x, h: 10, draw: (pg, x0, top) => pg.drawLine({ start: { x: x0, y: PH - top - 4 }, end: { x: x0 + 140, y: PH - top - 4 }, thickness: 0.6, color: RULE }) }); }
+          const lvl = (ctx.lvl || 0) + 1, ind = Math.min(22, width * 0.15);
+          let k = 0;
+          for (const li of n.children) {
+            if (li.tagName !== 'LI') continue; k++;
+            const t = tg === 'OL' ? k + '.' : ['•', '–', '•'][(lvl - 1) % 3];
+            const boxes = await container(li, x + ind, width - ind, lst, { ...ctx, lvl, li: 1 });
+            const fb = boxes.find(b => !b.gap && b.h);
+            if (fb && fb.draw) { const dr = fb.draw; const mw = wOf(t, lst); fb.draw = (pg, x0, top) => { const L = { items: [], sz: lst.size, mark: { t, st: lst, dx: -ind + Math.max(0, ind - 6 - mw) } }; drawLine(pg, L, x0, top); dr(pg, x0, top); }; }
+            out.push(...boxes);
+          }
+          if (!ctx.lvl) out.push({ gap: 5 });
+        }
+        else if (tg === 'TABLE') out.push(...await table(n, x, width, st, ctx));
+        else if (tg === 'HR') { if (n.classList.contains('pb')) out.push({ pb: 1 }); else out.push({ gap: 4 }, { x, h: 8, draw: (pg, x0, top) => pg.drawLine({ start: { x: x0, y: PH - top - 4 }, end: { x: x0 + width, y: PH - top - 4 }, thickness: 0.6, color: RULE }) }, { gap: 4 }); }
+        else if (tg === 'BLOCKQUOTE') out.push(...await container(n, x + 18, width - 18, st, ctx));
+        else out.push(...await container(n, x, width, st, ctx));
+      }
+      await flushInl();
+      return out;
+    };
+    // ---- tableaux
+    const table = async (tb, x, width, st, ctx) => {
+      const rows = [...tb.rows]; if (!rows.length) return [];
+      const ncol = Math.max(...rows.map(r => [...r.cells].reduce((a, c) => a + (c.colSpan || 1), 0)));
+      const cst = { size: Math.min(st.size, 10), lh: 1.28 }, pad = 4;
+      const nat = Array(ncol).fill(20), min = Array(ncol).fill(20);
+      for (const r of rows) { let c = 0; for (const cell of r.cells) { const sp = cell.colSpan || 1; if (sp === 1 && c < ncol) { const txt = clean(cell.textContent || ''); nat[c] = Math.max(nat[c], Math.min(width, wOf(txt, cst) + 2 * pad + 2)); min[c] = Math.max(min[c], Math.min(width / ncol * 1.6, Math.max(...txt.split(/\s+/).map(w => wOf(w, cst))) + 2 * pad + 2)); } c += sp; } }
+      let cw; const sn = nat.reduce((a, b) => a + b, 0), sm = min.reduce((a, b) => a + b, 0);
+      if (sn <= width) cw = nat.map(v => v * width / sn);
+      else if (sm >= width) cw = min.map(v => v * width / sm);
+      else { const ex = width - sm, sd = sn - sm; cw = min.map((v, i) => v + ex * (nat[i] - v) / sd); }
+      const out = [{ gap: 4 }];
+      for (const r of rows) {
+        let c = 0; const cells = [];
+        for (const cell of r.cells) {
+          const sp = cell.colSpan || 1; const w = cw.slice(c, c + sp).reduce((a, b) => a + b, 0); const cx = cw.slice(0, c).reduce((a, b) => a + b, 0);
+          const th = cell.tagName === 'TH' || (cell.closest('thead') && 1);
+          const boxes = (await container(cell, 0, w - 2 * pad, th ? { ...cst, b: 1 } : cst, { ...ctx, cell: 1, lvl: 0 }));
+          while (boxes.length && boxes[boxes.length - 1].gap) boxes.pop();
+          cells.push({ cx, w, th, boxes }); c += sp;
+        }
+        if (c < ncol) { const cx = cw.slice(0, c).reduce((a, b) => a + b, 0); cells.push({ cx, w: width - cx, boxes: [], empty: 1 }); }
+        out.push(rowBox(cells, x, pad));
+      }
+      out.push({ gap: 8 });
+      return out;
+    };
+    const hOf = (bs) => bs.reduce((a, b) => a + (b.gap || b.h || 0), 0);
+    const rowBox = (cells, x, pad) => {
+      const h = Math.max(14, ...cells.map(c => hOf(c.boxes))) + 2 * pad;
+      return {
+        x, h,
+        draw: (pg, x0, top) => {
+          for (const c of cells) {
+            if (c.th) pg.drawRectangle({ x: x0 + c.cx, y: PH - top - h, width: c.w, height: h, color: HEAD });
+            let y = top + pad; for (const b of c.boxes) { if (b.gap) { y += b.gap; continue; } if (b.draw) b.draw(pg, x0 + c.cx + pad + (b.x || 0), y); y += b.h; }
+            if (!c.empty) pg.drawRectangle({ x: x0 + c.cx, y: PH - top - h, width: c.w, height: h, borderColor: RULE, borderWidth: 0.6 });
+          }
+        },
+        split: (avail) => {
+          const lim = avail - 2 * pad; const a = [], b = []; let any = false;
+          for (const c of cells) {
+            let y = 0, k = 0; while (k < c.boxes.length && y + (c.boxes[k].gap || c.boxes[k].h || 0) <= lim) { y += c.boxes[k].gap || c.boxes[k].h || 0; k++; }
+            if (k > 0 && c.boxes.slice(0, k).some(x => !x.gap)) any = true;
+            const rest = c.boxes.slice(k); while (rest.length && rest[0].gap) rest.shift();
+            a.push({ ...c, boxes: c.boxes.slice(0, k) }); b.push({ ...c, boxes: rest });
+          }
+          if (!any) return null;
+          return [rowBox(a, x, pad), rowBox(b, x, pad)];
+        },
+      };
+    };
+
+    // ---- construction puis mise en pages
+    const boxes = await container(root, 0, CW, BODY);
+    let page = null, y = 0;
+    const newPage = () => { page = pdf.addPage([PW, PH]); y = 0; };
+    newPage();
+    for (let i = 0; i < boxes.length; i++) {
+      let b = boxes[i];
+      if (b.pb) { if (y > 0) newPage(); continue; }
+      if (b.gap) { if (y > 0) y = Math.min(AV, y + b.gap); continue; }
+      let need = b.h;
+      if (b.keep) { for (let j = i + 1; j < boxes.length; j++) { const n = boxes[j]; if (n.pb) break; if (n.gap) { need += n.gap; continue; } need += n.keep ? n.h : Math.min(n.h, 40); if (!n.keep) break; } need = Math.min(need, AV * 0.4); }
+      if (y > 0 && y + need > AV) {
+        if (b.split && AV - y > 40) { const s = b.split(AV - y); if (s) { s[0].draw(page, ML + (b.x || 0), MT + y); newPage(); b = s[1]; } else newPage(); }
+        else newPage();
+      }
+      let guard = 0;
+      while (b.h > AV && b.split && guard++ < 200) { const s = b.split(AV - y); if (!s) break; s[0].draw(page, ML + (b.x || 0), MT + y); newPage(); b = s[1]; }
+      if (b.draw) b.draw(page, ML + (b.x || 0), MT + y); y += b.h || 0;
+    }
+    const pages = pdf.getPages(), n = pages.length;
+    if (n > 1) pages.forEach((p, k) => { const t = `${k + 1} / ${n}`; p.drawText(t, { x: PW / 2 - F.r.widthOfTextAtSize(t, 8.5) / 2, y: MB / 2 - 4, size: 8.5, font: F.r, color: MUTED }); });
+    return await pdf.save();
+  },
+};
+window.Docx = Docx;
 
 /* =================== Clavier global =================== */
 document.addEventListener('keydown', (e) => {

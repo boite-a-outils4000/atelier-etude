@@ -1,6 +1,6 @@
 # Atelier d'étude
 
-Ton cours en PDF à gauche, tes notes à droite. Annoter, prendre des notes (aussi sur une vidéo YouTube, avec le minutage), enregistrer et transcrire le cours, réviser (QCM à degrés de certitude, séance du jour, bilan), travailler à plusieurs.
+Ton cours en PDF ou en Word (.docx) à gauche, tes notes à droite. Annoter, prendre des notes (aussi sur une vidéo YouTube, avec le minutage), enregistrer et transcrire le cours, réviser (QCM à degrés de certitude, séance du jour, bilan), travailler à plusieurs.
 
 **Utiliser l'application : https://boite-a-outils4000.github.io/atelier-etude/**
 
@@ -15,7 +15,7 @@ La lecture des photos de notes manuscrites, à la demande, utilise Claude (API A
   - `source.html` : le code de l'application ;
   - `build.py` : assemble le fichier autonome `Atelier-etude.html` et le dossier `web/` publiable ;
   - `fonts/` : Nunito, Source Sans 3, Atkinson Hyperlegible, OpenDyslexic (licence SIL OFL) ;
-  - `vendor/` : pdf.js 3.11.174 (Mozilla, Apache 2.0) et pdf-lib 1.17.1 (MIT) ;
+  - `vendor/` : pdf.js 3.11.174 (Mozilla, Apache 2.0), pdf-lib 1.17.1 (MIT) et mammoth 1.13.0 (BSD 2-Clause, lecture des fichiers Word, converti en PDF dans le navigateur) ;
   - `tests/` : tests automatiques (Python + Playwright).
 
 Barème des degrés de certitude : D. Leclercq (Université de Liège).
