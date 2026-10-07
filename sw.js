@@ -1,5 +1,5 @@
-// Atelier d'étude — fonctionnement hors ligne. Version : 3594270f03
-const CACHE = 'atelier-3594270f03';
+// Atelier d'étude — fonctionnement hors ligne. Version : e1cb201869
+const CACHE = 'atelier-e1cb201869';
 const FILES = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png', 'apple-touch-icon.png', 'favicon.png'];
 self.addEventListener('install', (e) => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES))); });
 self.addEventListener('activate', (e) => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k.startsWith('atelier-') && k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });

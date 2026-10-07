@@ -1108,7 +1108,7 @@ body.justify .notes-list .body h2, body.justify .notes-list .body h3, body.justi
     <div class="dd"><button class="btn ghost icon" id="viewBtn" data-dd="ddView" title="Affichage : thème, disposition, texte, confort" aria-label="Affichage"><svg class="i" viewBox="0 0 24 24"><path d="M3 19l5-14 5 14M4.8 14h6.4M15 19v-6.5a3 3 0 0 1 6 0V19M15 15.5h6"/></svg></button></div>
     <button class="btn ghost icon" id="helpBtn" title="Raccourcis clavier et aide (?)" aria-label="Aide">?</button>
     <button class="hidden" id="themeBtn" tabindex="-1" aria-hidden="true"></button>
-    <input type="file" id="fileInput" accept="application/pdf,.pdf" hidden>
+    <input type="file" id="fileInput" accept="application/pdf,.pdf,application/json,.json" hidden>
     <input type="file" id="jsonInput" accept="application/json,.json" hidden>
     <input type="file" id="refInput" accept="application/pdf,.pdf" hidden>
     <input type="file" id="audioInput" accept="audio/*,.m4a,.mp3,.wav,.webm,.ogg,.aac,.opus" hidden>
@@ -1203,7 +1203,7 @@ body.justify .notes-list .body h2, body.justify .notes-list .body h3, body.justi
             <p>ou glisse un fichier ici · <span class="kbd">⌘O</span></p>
             <button class="btn home-nb" id="nbBtn2"><svg class="i" viewBox="0 0 24 24"><path d="M6 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6z"/><path d="M6 3v18M9.5 8h6M9.5 12h6"/></svg>Carnet sans document</button>
             <button class="btn home-vid" id="vidBtn2"><svg class="i" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="3.5"/><path d="M10 9.2v5.6l4.8-2.8z"/></svg>Prendre des notes sur une vidéo YouTube</button>
-            <p class="small">Un PowerPoint s'exporte en PDF via Fichier → Exporter → PDF.</p>
+            <p class="small">Un PowerPoint s'exporte en PDF via Fichier → Exporter → PDF. Une sauvegarde de notes, des QCM ou les notes d'un collègue (.json) s'ouvrent aussi ici.</p>
           </div>
         </div>
       </div>
@@ -1585,16 +1585,16 @@ const workerReady = (async () => {
 })();
 
 /* =================== Ouverture des fichiers =================== */
-const PDF_TYPES = [{ description: 'Document PDF', accept: { 'application/pdf': ['.pdf'] } }];
+const PDF_TYPES = [{ description: 'Cours (PDF) ou sauvegarde de notes (.json)', accept: { 'application/pdf': ['.pdf'], 'application/json': ['.json'] } }];
 async function pickPdf() {
   if (window.showOpenFilePicker) {
-    try { const [h] = await showOpenFilePicker({ types: PDF_TYPES, id: 'cours' }); const f = await h.getFile(); return openFile(f, h); }
+    try { const [h] = await showOpenFilePicker({ types: PDF_TYPES, id: 'cours' }); const f = await h.getFile(); if (/\.json$/i.test(f.name) || f.type === 'application/json') return importBackupFile(f); return openFile(f, h); }
     catch (e) { if (e.name !== 'AbortError') $('fileInput').click(); return; }
   }
   $('fileInput').click();
 }
 $('openBtn').onclick = $('openBtn2').onclick = pickPdf;
-$('fileInput').onchange = (e) => { const f = e.target.files[0]; if (f) openFile(f); e.target.value = ''; };
+$('fileInput').onchange = (e) => { const f = e.target.files[0]; if (f) { if (/\.json$/i.test(f.name) || f.type === 'application/json') importBackupFile(f); else openFile(f); } e.target.value = ''; };
 ['dragenter', 'dragover'].forEach(ev => document.addEventListener(ev, (e) => { if ([...(e.dataTransfer?.types || [])].includes('Files')) { e.preventDefault(); $('drop').classList.add('over'); } }));
 document.addEventListener('dragleave', (e) => { if (!e.relatedTarget) $('drop').classList.remove('over'); });
 document.addEventListener('drop', (e) => {
