@@ -1041,6 +1041,11 @@ body.justify .notes-list .body h2, body.justify .notes-list .body h3, body.justi
 #print .trp { font-size: 10pt; line-height: 1.45; margin: 0 0 6pt; }
 /* ===== v15 : menus et taille de l'interface ===== */
 .notes .dd-menu { zoom: 1; }
+/* ===== v18 : PDF à côté d'un carnet ===== */
+body.nb.nb-ref .main:not(.focus-notes):not(.focus-pdf) { grid-template-columns: var(--left, 60%) 7px 1fr !important; }
+body.nb.nb-ref #viewer, body.nb.nb-ref #refsplit { display: none !important; }
+body.nb.nb-ref #refpane { flex: 1 1 auto !important; max-width: none !important; width: auto !important; }
+.nb-acts .btn.primary { color: #fff; }
 /* Mouvement réduit */
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
@@ -2281,14 +2286,14 @@ $('thumbsBtn').onclick = () => { prefs.thumbs = !prefs.thumbs; savePrefs(); appl
 const REF = { pdf: null, name: '', pages: [], scale: 1, fit: true, current: 1 };
 const refViewer = $('refViewer');
 async function pickRef() {
-  if (window.showOpenFilePicker) { try { const [h] = await showOpenFilePicker({ types: PDF_TYPES, id: 'reference' }); return loadRef(await h.getFile()); } catch (e) { if (e.name !== 'AbortError') $('refInput').click(); return; } }
+  if (window.showOpenFilePicker) { try { const [h] = await showOpenFilePicker({ types: [{ description: 'Document PDF', accept: { 'application/pdf': ['.pdf'] } }], id: 'reference' }); return loadRef(await h.getFile(), h); } catch (e) { if (e.name !== 'AbortError') $('refInput').click(); return; } }
   $('refInput').click();
 }
 $('refInput').onchange = (e) => { const f = e.target.files[0]; e.target.value = ''; if (f) loadRef(f); };
 $('refBtn').onclick = () => { if (!$('refpane').classList.contains('hidden')) closeRef(); else pickRef(); };
 $('refSwap').onclick = pickRef;
 $('refClose').onclick = closeRef;
-async function loadRef(file) {
+async function loadRef(file, handle) {
   await workerReady;
   try {
     const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(await file.arrayBuffer()), isEvalSupported: false }).promise;
@@ -2303,14 +2308,16 @@ async function loadRef(file) {
       wrap.appendChild(div); REF.pages.push({ n: i, page, w: vp.width, h: vp.height, div, rendered: 0 });
     }
     showRefPane(true); refViewer.scrollTop = 0;
+    if (typeof Nb !== 'undefined' && Nb.active()) { S.doc.refName = REF.name; saveSoon(true); if (handle) DB.set('nbref:' + S.doc.fp, handle); Nb.stage(); }
     toast('Document ouvert à côté. Sélectionne un passage pour le citer dans tes notes.', { duration: 3500 });
   } catch (e) { console.error(e); toast('Impossible d\'ouvrir ce document.'); }
 }
 function showRefPane(on) {
+  document.body.classList.toggle('nb-ref', !!on && typeof Nb !== 'undefined' && Nb.active());
   $('refpane').classList.toggle('hidden', !on); $('refsplit').classList.toggle('hidden', !on); $('refBtn').classList.toggle('on', on);
   applyRefLayout(); setTimeout(() => { layout(true); refLayout(); }, 30);
 }
-function closeRef() { showRefPane(false); if (REF.pdf) { try { REF.pdf.destroy(); } catch (e) {} } REF.pdf = null; REF.pages = []; $('refPages').innerHTML = ''; }
+function closeRef() { if (typeof Nb !== 'undefined' && Nb.active() && S.doc.refName) { delete S.doc.refName; saveSoon(true); DB.del('nbref:' + S.doc.fp); setTimeout(() => Nb.stage(), 0); } showRefPane(false); if (REF.pdf) { try { REF.pdf.destroy(); } catch (e) {} } REF.pdf = null; REF.pages = []; $('refPages').innerHTML = ''; }
 function applyRefLayout() { $('vwrap').classList.toggle('stack', prefs.refLayout === 'stack'); $('refpane').style.setProperty('--refsize', prefs.refSize + '%'); $('refpane').style.flexBasis = prefs.refSize + '%'; }
 $('refLayout').onclick = () => { prefs.refLayout = prefs.refLayout === 'stack' ? 'side' : 'stack'; savePrefs(); applyRefLayout(); setTimeout(() => { layout(true); refLayout(); }, 30); };
 function refLayout() {
@@ -5499,18 +5506,23 @@ const Nb = {
     S.search = { q: '', hits: [], idx: -1, texts: {} }; S.shown.clear(); S.filters.clear(); S.nq = ''; $('noteSearch').value = ''; $('noteSearchClr').classList.add('hidden');
     $('docTitle').value = d.title; $('docTitle').disabled = false;
     $('welcome').classList.add('hidden'); $('notesPane').classList.remove('off');
-    S.view = 'all'; this.stage(); $('quick').placeholder = 'Note rapide (Entrée)';
+    S.view = 'all'; this.stage(); $('quick').placeholder = 'Note rapide (Entrée)'; document.body.classList.toggle('nb-ref', !$('refpane').classList.contains('hidden')); setTimeout(() => { layout(true); if (typeof refLayout === 'function') refLayout(); }, 30);
     saveSoon(true); renderNotes(); renderTabs(); setTimeout(fitTopbar, 30);
     const n = d.notes.length;
     if (first && n) toast(`${n} note${n > 1 ? 's' : ''} retrouvée${n > 1 ? 's' : ''}.`);
   },
-  hide() { document.body.classList.remove('nb'); this.doc = null; const st = $('nbStage'); if (st) st.classList.add('hidden'); },
+  async reopenRef() {
+    const h = S.doc && await DB.get('nbref:' + S.doc.fp).catch(() => null);
+    if (h && h.getFile) { try { let p = await h.queryPermission({ mode: 'read' }); if (p !== 'granted') p = await h.requestPermission({ mode: 'read' }); if (p === 'granted') return loadRef(await h.getFile(), h); } catch (e) {} }
+    toast('Choisis à nouveau le PDF « ' + (S.doc.refName || '') + ' ».'); pickRef();
+  },
+  hide() { document.body.classList.remove('nb', 'nb-ref'); this.doc = null; const st = $('nbStage'); if (st) st.classList.add('hidden'); },
   stage() {
     let st = $('nbStage');
     if (!st) {
       st = document.createElement('div'); st.id = 'nbStage'; st.className = 'nb-stage';
       $('viewer').appendChild(st);
-      st.addEventListener('click', (e) => { const a = e.target.closest('[data-nb]')?.dataset.nb; if (a === 'attach') this.attach(); else if (a === 'rec') RecUI.click(e); else if (a === 'abbr') Abbr.settings(); });
+      st.addEventListener('click', (e) => { const a = e.target.closest('[data-nb]')?.dataset.nb; if (a === 'ref') pickRef(); else if (a === 'reopen') this.reopenRef(); else if (a === 'attach') this.attach(); else if (a === 'rec') RecUI.click(e); else if (a === 'abbr') Abbr.settings(); });
     }
     st.classList.remove('hidden');
     const d = this.doc;
@@ -5520,10 +5532,12 @@ const Nb = {
       <p>Pour un cours sans support, ou quand les slides arrivent après le cours. Tes notes s'écrivent à droite, dans l'ordre où tu les prends.</p>
       <p class="small">Créé le ${new Date(d.created || Date.now()).toLocaleDateString('fr-BE', { weekday: 'long', day: 'numeric', month: 'long' })}.</p>
       <div class="nb-acts">
+        <button class="btn primary" data-nb="ref"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="8" height="16" rx="1.5"/><rect x="13" y="4" width="8" height="16" rx="1.5"/></svg>Afficher un PDF à côté…</button>
+        ${d.refName ? `<button class="btn" data-nb="reopen">Rouvrir « ${esc(clip(d.refName, 40))} »</button>` : ''}
         <button class="btn" data-nb="rec">${ICON_MIC}Enregistrer le cours</button>
         <button class="btn" data-nb="attach"><svg class="i" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Rattacher à un PDF…</button>
       </div>
-      <p class="small nb-tip">Quand tu reçois le PDF du cours, « Rattacher à un PDF » y déplace toutes ces notes (et l'enregistrement s'il y en a un). Astuce : les abréviations (« gvt » → « gouvernement ») se règlent <button class="lnkbtn" data-nb="abbr">ici</button>.</p>
+      <p class="small nb-tip">« Afficher un PDF à côté » ouvre un document pour le consulter pendant que tu écris ; tes notes restent dans le carnet, et le ✕ en haut du PDF le retire. Quand tu reçois le PDF du cours, « Rattacher à un PDF » y déplace toutes ces notes (et l'enregistrement s'il y en a un). Astuce : les abréviations (« gvt » → « gouvernement ») se règlent <button class="lnkbtn" data-nb="abbr">ici</button>.</p>
     </div>`;
   },
   attach() {
