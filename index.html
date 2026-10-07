@@ -1116,6 +1116,7 @@ body.nb.nb-ref #refpane { flex: 1 1 auto !important; max-width: none !important;
     <input type="file" id="fileInput" accept="application/pdf,.pdf,application/json,.json" hidden>
     <input type="file" id="jsonInput" accept="application/json,.json" hidden>
     <input type="file" id="refInput" accept="application/pdf,.pdf" hidden>
+    <input type="file" id="ocrInput" accept="image/*,.heic,.heif" multiple hidden>
     <input type="file" id="audioInput" accept="audio/*,.m4a,.mp3,.wav,.webm,.ogg,.aac,.opus" hidden>
   </div>
 </header>
@@ -1141,6 +1142,7 @@ body.nb.nb-ref #refpane { flex: 1 1 auto !important; max-width: none !important;
   <button id="refBtn" class="needdoc-item"><span class="ico"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="8" height="16" rx="1.5"/><rect x="13" y="4" width="8" height="16" rx="1.5"/></svg></span><span class="tx">Document de référence à côté<span class="d">Un article, un décret… consulté en même temps</span></span></button>
   <button id="readBtn" class="needdoc-item"><span class="ico"><svg class="i" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></span><span class="tx">Lecture plein écran</span><span class="k kbd">⌥L</span></button>
   <button id="recItem" class="needdoc-item"><span class="ico"><svg class="i" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></span><span class="tx">Enregistrer et transcrire le cours<span class="d">Sur ton ordinateur ; tes notes sont reliées au son</span></span><span class="k kbd">⌥M</span></button>
+  <button id="ocrItem" class="needdoc-item"><span class="ico"><svg class="i" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span><span class="tx">Lire des photos de notes…<span class="d">Tes notes écrites à la main deviennent du texte (Claude)</span></span></button>
   <button id="audioItem" class="needdoc-item"><span class="ico"></span><span class="tx">Transcrire un fichier audio…<span class="d">Un enregistrement fait avec ton téléphone</span></span></button>
   <button id="installItem" class="hidden" data-c="install"><span class="ico"><svg class="i" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg></span><span class="tx">Installer l'application<span class="d">Une icône dans le Dock, utilisable sans connexion</span></span></button>
   <hr><h5>Sauvegarde</h5>
@@ -1332,6 +1334,8 @@ body.nb.nb-ref #refpane { flex: 1 1 auto !important; max-width: none !important;
       <button data-ins="ret"><span class="swatch" style="background:var(--c-ret)"></span>À retenir</button>
       <button data-ins="ex"><span class="swatch" style="background:var(--c-ex)"></span>Exemple</button>
       <button data-ins="att"><span class="swatch" style="background:var(--c-att)"></span>Attention</button>
+      <hr>
+      <button data-ins="ocr">Photo de notes manuscrites → texte…</button>
       <hr>
       <button data-ins="table">Tableau (2 colonnes)</button>
       <button data-ins="table3">Tableau (3 colonnes)</button>
@@ -1608,13 +1612,14 @@ document.addEventListener('drop', (e) => {
   const items = [...e.dataTransfer.items]; const files = [...e.dataTransfer.files];
   if (e.target.closest && e.target.closest('#refpane')) { const rf = files.find(f => /\.pdf$/i.test(f.name)); if (rf) { loadRef(rf); return; } }
   const i = files.findIndex(f => /\.pdf$/i.test(f.name) || f.type === 'application/pdf');
-  if (i < 0) { const j = files.find(f => /\.json$/i.test(f.name)); if (j) importBackupFile(j); else toast('Ce fichier n\'est pas un PDF.'); return; }
+  if (i < 0) { const j = files.find(f => /\.json$/i.test(f.name)); if (j) importBackupFile(j); else { const im = files.filter(f => /^image\//.test(f.type) || /\.(jpe?g|png|webp|heic|heif)$/i.test(f.name)); if (im.length && S.doc) Ocr.files(im); else toast('Ce fichier n\'est pas un PDF.'); } return; }
   const hp = items[i] && items[i].getAsFileSystemHandle ? items[i].getAsFileSystemHandle() : null;
   (hp ? hp.catch(() => null) : Promise.resolve(null)).then(h => openFile(files[i], h));
 });
 
 S.tabs = [];
-async function openFile(file, handle) {
+async function openFile(file, handle, direct) {
+  if (!direct && typeof Nb !== 'undefined' && Nb.active() && !Nb.pendingAttach && !S.afterOpen) return Nb.askOpen(file, handle);
   $('loading').classList.add('on'); $('welcome').classList.add('hidden');
   try {
     await workerReady;
@@ -2518,7 +2523,7 @@ $('ddMore').addEventListener('click', (e) => { const b = e.target.closest('[data
 $('ddColor').addEventListener('click', (e) => { const b = e.target.closest('[data-color]'); if (!b) return; closeDD(); const body = activeBody(); if (!body) return toast('Sélectionne du texte dans une note.'); exec('foreColor', b.dataset.color || (isDark() ? '#e6ebec' : '#1f2a30')); if (!b.dataset.color) { body.querySelectorAll('span[style*="color"]').forEach(sp => { if (/rgb\((230, 235, 236|31, 42, 48)\)/.test(sp.style.color)) sp.style.color = ''; }); } commit(body); });
 $('ddHl').addEventListener('click', (e) => { const b = e.target.closest('[data-hl]'); if (!b) return; closeDD(); hlText(b.dataset.hl); });
 function hlText(color) { const body = activeBody(); if (!body) return toast('Sélectionne du texte dans une note.'); if (getSelection().isCollapsed) return toast('Sélectionne d\'abord le texte à surligner.'); exec('hiliteColor', color); commit(body); }
-$('ddBlock').addEventListener('click', (e) => { const b = e.target.closest('[data-ins]'); if (b) { closeDD(); insertBlock(b.dataset.ins); } });
+$('ddBlock').addEventListener('click', (e) => { const b = e.target.closest('[data-ins]'); if (b) { closeDD(); if (b.dataset.ins === 'ocr') return Ocr.start(); insertBlock(b.dataset.ins); } });
 
 /* Commandes « / » et raccourcis Markdown */
 const TEMPLATES = {
@@ -3278,7 +3283,7 @@ async function openCourse(fp, page, noteId) {
   if (h && h.getFile) {
     try {
       let p = await h.queryPermission({ mode: 'read' }); if (p !== 'granted') p = await h.requestPermission({ mode: 'read' });
-      if (p === 'granted') { const f = await h.getFile(); await openFile(f, h); after(); return; }
+      if (p === 'granted') { const f = await h.getFile(); await openFile(f, h, true); after(); return; }
     } catch (e) { console.warn(e); }
   }
   toast(`Choisis le fichier « ${d.name} » : tes notes s'afficheront automatiquement.`, { duration: 5000 });
@@ -5586,6 +5591,14 @@ const Nb = {
     const n = d.notes.length;
     if (first && n) toast(`${n} note${n > 1 ? 's' : ''} retrouvée${n > 1 ? 's' : ''}.`);
   },
+  // Un PDF ouvert depuis un carnet : à côté (le carnet reste ouvert) ou comme nouveau cours
+  askOpen(file, handle) {
+    const m = openModal('Ouvrir « ' + esc(file.name.replace(/\.pdf$/i, '')) + ' »', `<p>Tu es dans un carnet. Que veux-tu faire de ce PDF ?</p>
+      <div class="nb-acts" style="margin:12px 0 4px"><button class="btn primary" id="nbAskSide">À côté de mon carnet<span class="small" style="margin-left:6px;opacity:.85">tu continues à écrire tes notes ici</span></button>
+      <button class="btn" id="nbAskTab">Comme un nouveau cours<span class="small" style="margin-left:6px;opacity:.7">dans un autre onglet, avec ses propres notes</span></button></div>`, 'sm');
+    m.querySelector('#nbAskSide').onclick = () => { closeModal(); loadRef(file, handle); };
+    m.querySelector('#nbAskTab').onclick = () => { closeModal(); openFile(file, handle, true); };
+  },
   async reopenRef() {
     const h = S.doc && await DB.get('nbref:' + S.doc.fp).catch(() => null);
     if (h && h.getFile) { try { let p = await h.queryPermission({ mode: 'read' }); if (p !== 'granted') p = await h.requestPermission({ mode: 'read' }); if (p === 'granted') return loadRef(await h.getFile(), h); } catch (e) {} }
@@ -5597,7 +5610,7 @@ const Nb = {
     if (!st) {
       st = document.createElement('div'); st.id = 'nbStage'; st.className = 'nb-stage';
       $('viewer').appendChild(st);
-      st.addEventListener('click', (e) => { const a = e.target.closest('[data-nb]')?.dataset.nb; if (a === 'ref') pickRef(); else if (a === 'reopen') this.reopenRef(); else if (a === 'attach') this.attach(); else if (a === 'rec') RecUI.click(e); else if (a === 'abbr') Abbr.settings(); });
+      st.addEventListener('click', (e) => { const a = e.target.closest('[data-nb]')?.dataset.nb; if (a === 'ref') pickRef(); else if (a === 'ocr') Ocr.start(); else if (a === 'reopen') this.reopenRef(); else if (a === 'attach') this.attach(); else if (a === 'rec') RecUI.click(e); else if (a === 'abbr') Abbr.settings(); });
     }
     st.classList.remove('hidden');
     const d = this.doc;
@@ -5609,6 +5622,7 @@ const Nb = {
       <div class="nb-acts">
         <button class="btn primary" data-nb="ref"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="8" height="16" rx="1.5"/><rect x="13" y="4" width="8" height="16" rx="1.5"/></svg>Afficher un PDF à côté…</button>
         ${d.refName ? `<button class="btn" data-nb="reopen">Rouvrir « ${esc(clip(d.refName, 40))} »</button>` : ''}
+        <button class="btn" data-nb="ocr"><svg class="i" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Lire des photos de notes…</button>
         <button class="btn" data-nb="rec">${ICON_MIC}Enregistrer le cours</button>
         <button class="btn" data-nb="attach"><svg class="i" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Rattacher à un PDF…</button>
       </div>
@@ -6055,6 +6069,105 @@ const NotesPdf = {
 };
 window.NotesPdf = NotesPdf;
 
+
+/* =================== Photos de notes manuscrites → texte (Claude, à la demande) =================== */
+const Ocr = {
+  API: 'https://api.anthropic.com/v1/messages', MODEL: 'claude-sonnet-5-5',
+  key() { try { return localStorage.getItem('etude.claudeKey') || ''; } catch (e) { return ''; } },
+  setKey(k) { try { if (k) localStorage.setItem('etude.claudeKey', k); else localStorage.removeItem('etude.claudeKey'); } catch (e) {} },
+  start() {
+    if (!S.doc) return toast('Ouvre d\'abord un cours, une vidéo ou un carnet.');
+    return this.settings(true);
+  },
+  settings(thenPick) {
+    closeDD();
+    const k = this.key();
+    const m = openModal('Lire des photos de notes', `<p>Prends en photo tes notes écrites à la main : Claude les lit et l'Atelier en fait des notes, avec ta mise en forme (titres, listes, flèches). Les mots difficiles à lire sont surlignés pour que tu les vérifies.</p>
+      <div class="field"><span class="lbl">Ta clé API Anthropic</span><input id="ocrKey" type="password" class="inp" style="width:100%" placeholder="sk-ant-…" value="${esc(k)}" autocomplete="off" spellcheck="false">
+      <p class="small" style="margin:6px 0 0">Crée-la sur <b>console.anthropic.com</b> (menu « API Keys ») et ajoute quelques euros de crédit : une page coûte environ 1 centime. La clé reste dans ce navigateur, elle n'est jamais mise dans tes sauvegardes.</p></div>
+      <div class="field"><label class="switch"><input type="checkbox" id="ocrPhoto" ${prefs.ocrKeepPhoto !== false ? 'checked' : ''}> Garder la photo dans la note (pour vérifier)</label></div>
+      <p class="small">La photo est envoyée à Anthropic seulement quand tu choisis de la faire lire, puis le texte revient dans l'Atelier.</p>
+      <div style="display:flex;gap:8px;justify-content:space-between;margin-top:12px">${k ? '<button class="btn" id="ocrDel">Oublier la clé</button>' : '<span></span>'}<span style="display:flex;gap:8px"><button class="btn" data-close2>Annuler</button><button class="btn primary" id="ocrOk">${thenPick ? 'Choisir les photos' : 'Enregistrer'}</button></span></div>`, 'sm');
+    m.querySelector('[data-close2]').onclick = closeModal;
+    const del = m.querySelector('#ocrDel'); if (del) del.onclick = () => { this.setKey(''); closeModal(); toast('Clé oubliée.'); };
+    m.querySelector('#ocrOk').onclick = () => {
+      const v = m.querySelector('#ocrKey').value.trim();
+      if (!/^sk-ant-/.test(v)) { m.querySelector('#ocrKey').focus(); return toast('Colle ta clé : elle commence par « sk-ant- ».'); }
+      this.setKey(v); prefs.ocrKeepPhoto = m.querySelector('#ocrPhoto').checked; savePrefs(); closeModal();
+      if (thenPick) $('ocrInput').click(); else toast('Réglages enregistrés.');
+    };
+  },
+  // photo réduite (moins de jetons, envoi rapide) ; orientation corrigée par le navigateur
+  async shrink(file, max, q) {
+    const bmp = await createImageBitmap(file, { imageOrientation: 'from-image' }).catch(() => null);
+    if (!bmp) throw new Error('format');
+    const r = Math.min(1, max / Math.max(bmp.width, bmp.height));
+    const c = document.createElement('canvas'); c.width = Math.round(bmp.width * r); c.height = Math.round(bmp.height * r);
+    const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(bmp, 0, 0, c.width, c.height);
+    return c.toDataURL('image/jpeg', q);
+  },
+  PROMPT: `Tu transcris des notes de cours manuscrites (en français) prises par un étudiant, à partir d'une photo.
+Règles :
+- Recopie fidèlement ce qui est écrit, sans résumer, sans compléter, sans corriger le fond. Corrige seulement les fautes d'orthographe évidentes.
+- Garde la structure : titres sur une ligne commençant par « # » (sous-titre : « ## »), listes avec « - » (une puce par ligne, sous-puces indentées de deux espaces), listes numérotées « 1. ».
+- Ce qui est souligné, encadré ou écrit en majuscules pour insister : entoure-le de ** **.
+- Recopie les flèches avec → ← ↔ ⇒ et les symboles (≠, ≈, +, =).
+- Un mot que tu n'arrives pas à lire avec certitude : écris ta meilleure lecture entre [[ ]], par exemple [[protectionnisme]]. Un passage illisible : [[illisible]].
+- Un schéma ou un dessin : décris-le en une ligne entre parenthèses, par exemple (schéma : …).
+- Réponds uniquement avec la transcription, sans phrase d'introduction.`,
+  async read(dataUrl) {
+    const r = await fetch(this.API, { method: 'POST', headers: { 'content-type': 'application/json', 'x-api-key': this.key(), 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: this.MODEL, max_tokens: 4000, system: this.PROMPT, messages: [{ role: 'user', content: [{ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: dataUrl.split(',')[1] } }, { type: 'text', text: 'Transcris ces notes.' }] }] }) });
+    if (r.status === 401) throw new Error('clé refusée : vérifie ta clé API (bouton « Réglages » ci-dessous)');
+    if (r.status === 402 || r.status === 400) { let m = ''; try { m = (await r.json()).error.message; } catch (e) {} if (/credit|balance/i.test(m)) throw new Error('plus de crédit sur ton compte Anthropic'); throw new Error(m || 'requête refusée'); }
+    if (r.status === 429) throw new Error('trop de demandes d\'un coup, réessaie dans une minute');
+    if (r.status >= 500) throw new Error('service momentanément indisponible, réessaie plus tard');
+    if (!r.ok) throw new Error('erreur ' + r.status);
+    const j = await r.json();
+    return (j.content || []).filter(c => c.type === 'text').map(c => c.text).join('\n').trim();
+  },
+  // texte « markdown simple » → HTML des notes
+  toHtml(md) {
+    const inl = (t) => esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/\[\[(.+?)\]\]/g, '<span style="background-color: rgb(255, 224, 102);" title="Lecture incertaine : vérifie ce mot">$1 ?</span>');
+    const lines = md.replace(/\r/g, '').split('\n'); let html = '', list = null, title = '';
+    const close = () => { if (list) { html += list.items.map(x => x).join('') + `</${list.tag}>`; list = null; } };
+    for (const raw of lines) {
+      const l = raw.replace(/\s+$/, ''); if (!l.trim()) { close(); continue; }
+      let m;
+      if ((m = l.match(/^#\s+(.*)/))) { close(); if (!title) { title = m[1].replace(/\*\*/g, '').replace(/\[\[|\]\]/g, ''); continue; } html += `<h2>${inl(m[1])}</h2>`; continue; }
+      if ((m = l.match(/^##+\s+(.*)/))) { close(); html += `<h3>${inl(m[1])}</h3>`; continue; }
+      if ((m = l.match(/^\s*[-•*]\s+(.*)/))) { if (!list || list.tag !== 'ul') { close(); list = { tag: 'ul', items: ['<ul>'] }; } list.items.push(`<li>${inl(m[1])}</li>`); continue; }
+      if ((m = l.match(/^\s*\d+[.)]\s+(.*)/))) { if (!list || list.tag !== 'ol') { close(); list = { tag: 'ol', items: ['<ol>'] }; } list.items.push(`<li>${inl(m[1])}</li>`); continue; }
+      close(); html += `<div>${inl(l)}</div>`;
+    }
+    close();
+    return { title, html };
+  },
+  async files(list) {
+    const files = [...list].filter(f => /^image\//.test(f.type) || /\.(jpe?g|png|webp|heic|heif)$/i.test(f.name)); if (!files.length) return;
+    if (!this.key()) return this.settings(true);
+    const keep = prefs.ocrKeepPhoto !== false; let done = 0, unsure = 0;
+    for (let i = 0; i < files.length; i++) {
+      const f = files[i];
+      toast(`Lecture de la photo ${i + 1} / ${files.length}…`, { duration: 60000 });
+      let send;
+      try { send = await this.shrink(f, 1568, 0.85); }
+      catch (e) { toast(`« ${f.name} » : format d'image non reconnu. Sur iPhone, choisis « Le plus compatible » (JPEG) dans Réglages → Appareil photo → Formats.`, { duration: 8000 }); continue; }
+      let txt;
+      try { txt = await this.read(send); }
+      catch (e) { toast('Lecture impossible : ' + (/fetch|network/i.test(e.message) ? 'pas de connexion internet' : e.message) + '.', { duration: 10000, action: 'Réglages', onAction: () => this.settings() }); return; }
+      if (!txt) continue;
+      const r = this.toHtml(txt); unsure += (txt.match(/\[\[/g) || []).length;
+      let html = r.html;
+      if (keep) { const small = await this.shrink(f, 1000, 0.7).catch(() => null); if (small) html += `<figure class="cap"><img src="${small}"><figcaption>Photo d'origine · ${esc(f.name)}</figcaption></figure>`; }
+      const n = addNote({ title: r.title || ('Notes manuscrites' + (files.length > 1 ? ' ' + (i + 1) : '')), html, noFocus: true });
+      if (n) { n.tags = n.tags || []; done++; }
+    }
+    if (done) toast(`${done} photo${done > 1 ? 's' : ''} transcrite${done > 1 ? 's' : ''}.${unsure ? ` ${unsure} mot${unsure > 1 ? 's' : ''} à vérifier, surligné${unsure > 1 ? 's' : ''} en jaune avec « ? ».` : ''}`, { duration: 7000 });
+  },
+};
+window.Ocr = Ocr;
+
 /* =================== Clavier global =================== */
 document.addEventListener('keydown', (e) => {
   const t = e.target; const editing = t.isContentEditable || /INPUT|TEXTAREA|SELECT/.test(t.tagName);
@@ -6132,6 +6245,8 @@ document.addEventListener('keydown', (e) => {
   $('recBtn').onclick = (e) => RecUI.click(e);
   $('recItem').onclick = () => { closeDD(); if (Rec.on) RecUI.menu(true); else if (prefs.recSeen) Rec.start(); else RecUI.click(); };
   $('audioItem').onclick = () => { closeDD(); $('audioInput').click(); };
+  $('ocrItem').onclick = () => { closeDD(); Ocr.start(); };
+  $('ocrInput').onchange = (e) => { const fs = [...e.target.files]; e.target.value = ''; Ocr.files(fs); };
   $('audioInput').onchange = (e) => { const f = e.target.files[0]; e.target.value = ''; RecUI.importFile(f); };
   { const pb = $('pbar'); pb.querySelector('.pb-play').onclick = () => Player.toggle(); pb.querySelector('.pb-back').onclick = () => Player.seek(-10); pb.querySelector('.pb-fwd').onclick = () => Player.seek(10); pb.querySelector('.pb-x').onclick = () => Player.close();
     pb.querySelector('.pb-rate').onclick = () => { const R = [1, 1.25, 1.5, 1.75, 2, 0.75]; Player.rate = R[(R.indexOf(Player.rate) + 1) % R.length]; if (Player.el) Player.el.playbackRate = Player.rate; Player.ui(); };
@@ -6148,7 +6263,7 @@ document.addEventListener('keydown', (e) => {
 })();
 // Après une ouverture demandée depuis la bibliothèque, aller à la bonne note
 const _openFile = openFile;
-openFile = async function (file, handle) { await _openFile(file, handle); if (S.afterOpen && S.afterOpen.fp === S.fp) { const a = S.afterOpen.after; S.afterOpen = null; a(); } else S.afterOpen = null; };
+openFile = async function (file, handle, direct) { await _openFile(file, handle, direct); if (S.afterOpen && S.afterOpen.fp === S.fp) { const a = S.afterOpen.after; S.afterOpen = null; a(); } else S.afterOpen = null; };
 })();
 </script>
 </body>

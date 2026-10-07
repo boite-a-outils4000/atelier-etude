@@ -6,7 +6,7 @@ Ton cours en PDF à gauche, tes notes à droite. Annoter, prendre des notes (aus
 
 Tout fonctionne dans le navigateur, hors ligne et sans compte : les notes restent sur l'ordinateur de chaque personne. Ce dépôt ne contient que l'outil.
 
-La vérification de la grammaire, à la demande, utilise LanguageTool (le texte de la note est alors envoyé à ce service). La transcription du cours utilise Whisper (OpenAI, licence MIT) via Transformers.js (Hugging Face, Apache 2.0), exécuté dans le navigateur : le son n'est envoyé nulle part. Le modèle est téléchargé une seule fois depuis Hugging Face.
+La lecture des photos de notes manuscrites, à la demande, utilise Claude (API Anthropic, avec la clé de l’utilisateur ; la photo est alors envoyée à Anthropic). La vérification de la grammaire, à la demande, utilise LanguageTool (le texte de la note est alors envoyé à ce service). La transcription du cours utilise Whisper (OpenAI, licence MIT) via Transformers.js (Hugging Face, Apache 2.0), exécuté dans le navigateur : le son n'est envoyé nulle part. Le modèle est téléchargé une seule fois depuis Hugging Face.
 
 ## Contenu du dépôt
 
